@@ -219,6 +219,7 @@ if ( ~keyUpAction.notNil ){ ~typing.removeAction( ~keyUpAction, \keyUpAction ); 
 	if ( char == ~nextToType ){
 		Routine({
 			~nextCharW.background_( Color.green );
+			Ndef( \right ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.75 );
 			0.2.wait;
 			~nextCharW.background_( Color.white );
 		}).play( AppClock );
@@ -226,8 +227,10 @@ if ( ~keyUpAction.notNil ){ ~typing.removeAction( ~keyUpAction, \keyUpAction ); 
 		Routine({
 			if( char == 8.asAscii ){
 				~nextCharW.background_( Color.yellow );
+				Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 );
 			}{
 				~nextCharW.background_( Color.red );
+				Ndef( \wrong ).set( \trig, 1, \freq,300, \dur, 0.75, \fmf, 60, \fma, 0.25 );
 			};
 			0.2.wait;
 			~nextCharW.background_( Color.white );
@@ -247,6 +250,8 @@ if ( ~fileRead.notNil ){ ~fileRead.close; };
 ~typingIndex = 1;
 ~updateNextChar.value( ~lineToTypeW.string[~typingIndex] );
 );
+
+"sounds.scd".resolveRelative.load;
 
 //
 //
