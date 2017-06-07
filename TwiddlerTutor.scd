@@ -33,9 +33,11 @@ w.addFlowLayout;
 ~typingIndex = 0;
 );
 
+~evaluatedLines = [];
+
 (
-//~typing.action = { arg field; field.string.postln; };
-~typing.addAction( { arg field, char, mods;
+if ( ~keyUpAction.notNil ){ ~typing.removeAction( ~keyUpAction, \keyUpAction ); };
+~keyUpAction = { arg field, char, mods;
 	var lastTyped = field.string.last;
 	if ( char == 8.asAscii ){ // backspace
 		~characterTyped.value( char );
@@ -45,7 +47,10 @@ w.addFlowLayout;
 		if ( char != 0.asAscii ){
 			// [ mods, char, lastTyped ].postcs;
 			if ( char == $\r ){
-				lastTyped = char
+				lastTyped = char;
+			};
+			if ( char == $\n ){
+				lastTyped = $\r;
 			};
 			if ( lastTyped.isNil ){
 				lastTyped = char;
@@ -57,6 +62,7 @@ w.addFlowLayout;
 						~typed.background_( Color.yellow );
 						~codeFunc = ~typed.string.compile;
 						if ( ~codeFunc.notNil ){
+							~evaluatedLines = ~evaluatedLines.add( ~typed.string );
 							~codeFunc.value;
 						};
 						0.2.wait;
@@ -67,9 +73,18 @@ w.addFlowLayout;
 							~typed.background_( Color.green );
 							0.2.wait;
 							~typed.string_( "" );
-							~lineToTypeW.string_("");
-							~readNextLine.value;
-							~typingIndex = 0;
+							[ ~lineToTypeW.string.size , ~typingIndex].postln;
+							if ( ~lineToTypeW.string.size <= ~typingIndex ){
+								~lineToTypeW.string_("");
+								~readNextLine.value;
+								~typingIndex = 0;
+							}{
+								// string longer than typed index
+								~lineToTypeW.string_( ~lineToTypeW.string.drop( ~typingIndex ) );
+
+								~readNextLine.value;
+								~typingIndex = 0;
+							};
 							~updateNextChar.value( ~lineToTypeW.string[~typingIndex] );
 						};
 						~typed.background_( Color.white );
@@ -77,7 +92,7 @@ w.addFlowLayout;
 
 				}{ // just enter
 					~typingIndex = ~typingIndex+1;
-					[ ~lineToTypeW.string.size , ~typingIndex].postln;
+					// [ ~lineToTypeW.string.size , ~typingIndex].postln;
 					if ( ~lineToTypeW.string.size <= ~typingIndex ){
 						~readNextLine.value;
 					};
@@ -85,7 +100,7 @@ w.addFlowLayout;
 				};
 			}{
 				~typingIndex = ~typingIndex+1;
-				[ ~lineToTypeW.string.size , ~typingIndex].postln;
+				// [ ~lineToTypeW.string.size , ~typingIndex].postln;
 				if ( ~lineToTypeW.string.size <= ~typingIndex ){
 					~readNextLine.value;
 				};
@@ -94,7 +109,12 @@ w.addFlowLayout;
 
 		}
 	}
-}, \keyUpAction );
+};
+);
+
+(
+//~typing.action = { arg field; field.string.postln; };
+~typing.addAction( ~keyUpAction, \keyUpAction );
 );
 
 ~config = TabFileReader.read( "twiddler_layout.csv".resolveRelative, true );
@@ -165,9 +185,15 @@ w.addFlowLayout;
 ~readNextLine = {
 	var newLine = ~fileRead.getLine;
 	var oldString = ~lineToTypeW.string;
+	if ( newLine.isNil ){
+		newLine = ~evaluatedLines.choose;
+	};
+	while( { oldString.first == $\n },{
+		oldString = oldString.drop(1);
+		oldString.postcs;
+	});
 	"newline: ".post; newLine.postln;
 	~lineToTypeW.string_( oldString ++ "\n" ++ newLine );
-	// ~lineToTypeW.string_( oldString ++ newLine );
 };
 );
 
@@ -184,7 +210,11 @@ w.addFlowLayout;
 			~typing.string = "";
 			char = $\n;
 		};
-		~typed.string = ( oldString ++ char );
+		if ( ~typed.string.size == 0 and: (char==$\n) ){
+			"typed size = 0, not adding \n".postln;
+		}{
+			~typed.string = ( oldString ++ char );
+		};
 	};
 	if ( char == ~nextToType ){
 		Routine({
@@ -219,3 +249,12 @@ if ( ~fileRead.notNil ){ ~fileRead.close; };
 );
 
 //
+//
+// (
+// var str = ~lineToTypeW.string;
+// str.size.postln;
+// str.replace( $\n, "" );
+// str.size.postln;
+// // str.find( $\n )
+// str.do{ |i| i.postcs }
+// );
