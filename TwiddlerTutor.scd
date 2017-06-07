@@ -197,11 +197,11 @@ w.addFlowLayout;
 );
 
 
-// ~rehearseFile = "/home/nescivi/Programming/SuperCollider/soundslikesoup/drones.scd";
 ~rehearseFile = "testscore.scd".resolveRelative;
-~fileRead = File.open( ~rehearseFile, "r" );
 
 (
+if ( ~fileRead.notNil ){ ~fileRead.close; };
+~fileRead = File.open( ~rehearseFile, "r" );
 ~lineToTypeW.string_("");
 ~readNextLine.value;
 ~typingIndex = 1;
@@ -209,4 +209,3 @@ w.addFlowLayout;
 );
 
 //
-~fileRead.close;
