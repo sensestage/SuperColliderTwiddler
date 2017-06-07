@@ -43,7 +43,7 @@ w.addFlowLayout;
 		~updateNextChar.value( ~lineToTypeW.string[~typingIndex] );
 	}{
 		if ( char != 0.asAscii ){
-			[ mods, char, lastTyped ].postcs;
+			// [ mods, char, lastTyped ].postcs;
 			if ( char == $\r ){
 				lastTyped = char
 			};
@@ -76,12 +76,19 @@ w.addFlowLayout;
 					}).play(AppClock);
 
 				}{ // just enter
-					~readNextLine.value;
 					~typingIndex = ~typingIndex+1;
+					[ ~lineToTypeW.string.size , ~typingIndex].postln;
+					if ( ~lineToTypeW.string.size <= ~typingIndex ){
+						~readNextLine.value;
+					};
 					~updateNextChar.value( ~lineToTypeW.string[~typingIndex] );
 				};
 			}{
 				~typingIndex = ~typingIndex+1;
+				[ ~lineToTypeW.string.size , ~typingIndex].postln;
+				if ( ~lineToTypeW.string.size <= ~typingIndex ){
+					~readNextLine.value;
+				};
 				~updateNextChar.value( ~lineToTypeW.string[~typingIndex] );
 			}
 
@@ -158,11 +165,14 @@ w.addFlowLayout;
 ~readNextLine = {
 	var newLine = ~fileRead.getLine;
 	var oldString = ~lineToTypeW.string;
+	"newline: ".post; newLine.postln;
 	~lineToTypeW.string_( oldString ++ "\n" ++ newLine );
+	// ~lineToTypeW.string_( oldString ++ newLine );
 };
 );
 
-~nextToType = $l
+// ~nextToType = $l
+
 (
 ~characterTyped = { |char|
 	var oldString = ~typed.string;
