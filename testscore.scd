@@ -8,7 +8,7 @@ Ndef( \drone, {
 
 Ndef( \drone ).set( \freq, 300 );
 Ndef( \drone ).set( \freq, 600 );
-Ndef( \drone ).set( \freq, 200 );
+Ndef( \drone ).set( \freq, 400 );
 
 (
 Ndef( \drone, {
