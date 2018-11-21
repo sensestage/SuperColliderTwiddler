@@ -12,7 +12,10 @@ Ndef( \drone ).set( \freq, 400 );
 
 (
 Ndef( \drone, {
-	SinOsc.ar( \freq.kr(500, 4) * SinOsc.ar( \fmf.kr(10), 0, \fma.kr(0.5), 1 ), 0, \amp.kr(0.1))
+	SinOsc.ar( \freq.kr(500, 4) *
+		SinOsc.ar( \fmf.kr(10), 0, \fma.kr(0.5), 1 ),
+		0, \amp.kr(0.1)
+	)
 });
 )
 
