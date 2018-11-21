@@ -58,6 +58,7 @@ TwiddlerTutor {
 
 	var <>config;
 
+	var <charsTyped = 0;
 	var <typingIndex = 0;
 	var <evaluatedLines;
 
@@ -67,18 +68,23 @@ TwiddlerTutor {
 
 	var <linesFromFile;
 	var <currentLineFromFileIndex;
+
 	var <linesExecuted;
+
 	var <currentLineFromFile;
 	var <currentLineTyped;
 
 	var <codeFunc;
 
 	// gui
+	var noPrintLines = 10; // 7; at size 200
+
 	var window;
 	var <lineToTypeW, <typed;
-	var spacer1;
+	var spacer1, spacer2;
 	var nextCharW, nextCharCodeW, buttonView, buttons;
-	var idsW;
+	var charsTypedW;
+	var idsW, idsLabel;
 	var lastCharW;
 	var keyUpAction;
 
@@ -105,6 +111,7 @@ TwiddlerTutor {
 	}
 
 	reset{
+		charsTyped = 0;
 		currentLineFromFileIndex = -1;
 		linesExecuted = 0;
 		currentLineTyped = "";
@@ -115,45 +122,64 @@ TwiddlerTutor {
 
 	makeWindow{
 		// gui
-		window = Window.new("LivecodeTwiddlerTutor", Rect( 0, 0, 800, 600) );
+		window = Window.new("LivecodeTwiddlerTutor", Rect( 10, 10, 804, 784) );
 		window.front;
-		window.addFlowLayout;
+		window.addFlowLayout( 2@2, 4@4 );
 
-		lineToTypeW = StaticText.new( window, Rect( 0,0, 800, 200 ) ).background_( Color.white );
+		lineToTypeW = StaticText.new( window, Rect( 0,0, 800, 300 ) ).background_( Color.gray(0.95) );
 		lineToTypeW.font_( Font.new( "Courier", 24) );
 
-		typed = StaticText.new( window, Rect( 0,0, 800, 200 ) ).background_( Color.white );
+		typed = StaticText.new( window, Rect( 0,0, 800, 300 ) ).background_( Color.white );
 		typed.font_( Font.new( "Courier", 24) );
 
-		spacer1 = StaticText.new( window, Rect( 0, 0, 50, 80 ) );
 
-		nextCharW = StaticText.new( window, Rect( 0, 0, 150, 80 ) );
+		lastCharW = StaticText.new( window, Rect( 0, 0, 95, 86 ) );
+		lastCharW.font_( Font.new( "Courier", 24) );
+		lastCharW.background_( Color.gray(0.8) ).align_( \center );
+		lastCharW.string_( "H" );
+
+		charsTypedW = StaticText.new( window, Rect( 0, 0, 75, 86 ) );
+		charsTypedW.font_( Font.new( "Courier", 16) );
+		charsTypedW.background_( Color.gray(0.8) ).align_( \center );
+		charsTypedW.string_( "chars typed\n0" );
+
+		spacer1 = StaticText.new( window, Rect( 0, 0, 10, 86 ) );
+
+		nextCharW = StaticText.new( window, Rect( 0, 0, 150, 86 ) );
 		nextCharW.font_( Font.new( "Courier", 64) );
 		nextCharW.background_( Color.white ).align_( \center );
 		nextCharW.string_( "H" );
 
-		nextCharCodeW = StaticText.new( window, Rect( 0, 0, 200, 80 ) );
+		nextCharCodeW = StaticText.new( window, Rect( 0, 0, 200, 86 ) );
 		nextCharCodeW.font_( Font.new( "Courier", 64) );
 		nextCharCodeW.background_( Color.white ).align_( \center );
 		nextCharCodeW.string_( "00ML" );
 
-		buttonView = CompositeView.new( window, Rect( 0,0, 4*26 + 5, 3*26 + 5 ) );
+		buttonView = CompositeView.new( window, Rect( 0,0, 3*20 + 6, 4*20 + 6 ) );
 		buttons = 3.collect{ |i| 4.collect{ |j| Button.new( buttonView, Rect( i*20+2, j*20+2, 21, 21 ) ).states_( [[ "", Color.black, Color.white], ["",Color.white, Color.black]] ).canFocus_( false ); } };
 
-		lastCharW = StaticText.new( window, Rect( 0, 0, 150, 40 ) );
-		lastCharW.font_( Font.new( "Courier", 24) );
-		lastCharW.background_( Color.yellow(0.8) ).align_( \center );
-		lastCharW.string_( "H" );
+		spacer2 = StaticText.new( window, Rect( 0, 0, 10, 86 ) );
 
-		idsW = StaticText.new( window, Rect( 0, 0, 100, 40 ) );
+		idsLabel = StaticText.new( window, Rect( 0, 0, 100, 86 ) );
+		idsLabel.font_( Font.new( "Courier", 16) );
+		idsLabel.background_( Color.gray(0.8) ).align_( \right );
+		idsLabel.string_( "from file:\ntyped:\nevaluated:" );
+
+		idsW = StaticText.new( window, Rect( 0, 0, 60, 86 ) );
 		idsW.font_( Font.new( "Courier", 16) );
-		idsW.background_( Color.yellow(0.8) ).align_( \center );
-		idsW.string_( "0:0:0:0" );
+		idsW.background_( Color.gray(0.8) ).align_( \center );
+
 
 		typing = TextField.new( window, Rect( 0,0, 800, 80 ) ).background_( Color.white );
 		typing.font_( Font.new( "Courier", 24) );
 
 		// ~historyV = StaticText.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.grey( 0.9 ) );
+	}
+
+	updateWindow {
+		charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
+		this.setStringLineToType;
+		this.setStringLineTyped;
 	}
 
 	setTypingAction {
@@ -162,6 +188,8 @@ TwiddlerTutor {
 			var lastTyped = field.string.last;
 			var codeResult;
 			"TYPING ACTION: ".post; lastTyped.postln;
+			charsTyped = charsTyped + 1;
+			charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
 			if ( char == 8.asAscii ){ // backspace
 				"typing action backspace".postln;
 				lastCharW.string_( "<--" );
@@ -464,44 +492,113 @@ TwiddlerTutor {
 
 	setStringLineToType {
 		var string = "";
-		linesFromFile.do{ |it,i|
-			string = string ++ (i+1).asString.padLeft(4) ++ "|";
+		var totalLines = linesFromFile.size;
+		var lineOffset = (totalLines - noPrintLines).max(0);
+		if ( currentLineFromFileIndex < lineOffset ){
+			lineOffset = (currentLineFromFileIndex - noPrintLines + 2);
+		};
+		linesFromFile.copyRange( lineOffset, lineOffset + noPrintLines - 1 ).do{ |it,i|
+			if ( currentLineFromFileIndex == (lineOffset + i+1) ){
+				string = string ++ (lineOffset + i+1).asString.padLeft(4,"*") ++ "|";
+			}{
+				string = string ++ (lineOffset + i+1).asString.padLeft(4) ++ "|";
+			};
 			string = string + it;
 			string = string ++ "\n";
 		};
 		lineToTypeW.string_( string );
 	}
 
+	calcEvaluatedLinesSize{
+		var size = 0;
+		var splitstring;
+		evaluatedLines.do{ |it,i|
+			splitstring = it.split( $\n );
+			splitstring.removeAllSuchThat{ |it| it == "" };
+			size = size + splitstring.size;
+		};
+		^size;
+	}
+
 	setStringLineTyped {
 		var string = "";
 		var offset = 0;
 		var splitstring;
-		evaluatedLines.do{ |it,i|
-			splitstring = it.split( $\n );
-			splitstring.postcs;
-			splitstring.do{ |jt,j|
-				if ( jt.size > 0 ){
-					string = string ++ (offset+1).asString.padLeft(4,"=") ++ "|";
-					string = string + jt;
-					string = string ++ "\n";
-					offset = offset + 1;
+		var totalLines;
+		var collectedLines;
+		var evIndex;
+
+		"---STRING line typed".postln;
+		totalLines = typedLines.size;
+
+		if ( totalLines < (noPrintLines-1) and: (evaluatedLines.size != 0) ){
+			collectedLines = [];
+			evIndex = evaluatedLines.size;
+			while ( { totalLines < (noPrintLines-1) },{
+				evIndex = evIndex - 1;
+				"evaluatedLine: ".post; evIndex.post; " ".post; evaluatedLines.at( evIndex ).postln;
+				if ( evaluatedLines.at( evIndex ).notNil ){
+					splitstring = evaluatedLines.at( evIndex ).split( $\n );
+					splitstring.postcs;
+					splitstring.reverseDo{ |jt,j|
+						if ( jt.size > 0 ){
+							collectedLines = collectedLines.add( jt );
+						};
+						totalLines.post; "-".post;
+						collectedLines.postln;
+						totalLines = totalLines + 1;
+					};
+				}{
+					totalLines = noPrintLines;
 				};
+			});
+			"collected lines: ".post;
+			collectedLines.size.postln;
+			collectedLines.postcs;
+
+			if ( typedLines.size + collectedLines.size > (noPrintLines-1) ){
+				// only keep last ones of collectedLines.
+				collectedLines = collectedLines.keep( noPrintLines - 1 - typedLines.size );
+
+				"resized collected lines: ".post;
+				collectedLines.size.postln;
+				collectedLines.postcs;
+			};
+			offset = linesExecuted - collectedLines.size + 1;
+			"offset ".post; offset.postln;
+			collectedLines.reverseDo{ |it,i|
+				string = string ++ (offset).asString.padLeft(4,"=") ++ "|";
+				string = string + it;
+				string = string ++ "\n";
+				offset = offset + 1;
+			};
+			"offset ".post; offset.postln;
+			// offset = offset - 1;
+			// "offset ".post; offset.postln;
+			typedLines.do{ |it,i|
+				string = string ++ (i+offset).asString.padLeft(4,"-") ++ "|";
+				string = string + it[1];
+				string = string ++ "\n";
+			};
+		}{
+			// only typed lines
+			offset = (totalLines - noPrintLines + 1).max(0);
+			typedLines.copyToEnd( offset ).do{ |it,i|
+				string = string ++ (i+offset+linesExecuted).asString.padLeft(4,"-") ++ "|";
+				string = string + it[1];
+				string = string ++ "\n";
 			};
 		};
-		typedLines.do{ |it,i|
-			string = string ++ (i+1+offset).asString.padLeft(4,"-") ++ "|";
-			string = string + it[1];
-			string = string ++ "\n";
-		};
-		string = string ++ (currentLineFromFileIndex).asString.padLeft(4,"*") ++ "|";
+
+		string = string ++ (currentLineFromFileIndex+1).asString.padLeft(4,"*") ++ "|";
 		string = string + typing.string;
 		typed.string_( string );
 
 		// ids string
 		string = "";
 		string = string ++ currentLineFromFileIndex.asString.padLeft(2) ++ ":";
-		string = string ++ linesFromFile.size.asString.padLeft(2) ++ ":";
-		string = string ++ typedLines.size.asString.padLeft(2) ++ ":";
+		string = string ++ linesFromFile.size.asString.padLeft(2) ++ "\n";
+		string = string ++ typedLines.size.asString.padLeft(2) ++ "\n";
 		string = string ++ evaluatedLines.size.asString.padLeft(2) ++ ":";
 		string = string ++ linesExecuted.asString.padLeft(2);
 		idsW.string_( string );
@@ -513,7 +610,7 @@ TwiddlerTutor {
 		typedLines.do{ |it,i|
 			codeString = codeString ++ it[1] ++ "\n";
 		};
-		linesExecuted = currentLineFromFileIndex;
+		// linesExecuted = currentLineFromFileIndex;
 		"----EVALUATING---".postln;
 		codeString.postcs;
 		"-----------------".postln;
@@ -521,6 +618,7 @@ TwiddlerTutor {
 		if ( codeFunc.notNil ){
 			result = true;
 			evaluatedLines = evaluatedLines.add( codeString );
+			linesExecuted = this.calcEvaluatedLinesSize;
 			typedLines = []; // reset
 			codeFunc.value;
 		}{

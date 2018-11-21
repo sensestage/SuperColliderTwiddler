@@ -2,9 +2,10 @@
 s.plotTree;
 
 
-// color of current line can be a mix of how well it is going. (red/green)t
+// color of current line can be a mix of how well it is going. (red/green)
+// color management task in background (now there are delays in the code
 
-// fix number of lines that are displayed ---> or which ones are displayed.
+// + fix number of lines that are displayed ---> or which ones are displayed.
 
 (
 ~config = TwiddlerConfig.new( "twiddler_cfg_thumbless_1-1.csv".resolveRelative );
@@ -14,18 +15,28 @@ s.plotTree;
 //~config2 = TwiddlerConfig.new( "twiddler_layout.csv".resolveRelative );
 g = TwiddlerTutor.new( ~config );
 );
+
+(
+g.reset; g.updateWindow;
 g.loadFile( "testscore.scd".resolveRelative; );
 );
-g.reset
+
+
+g.noPrintLines
 
 "	SinOsc.ar( \\freq.kr(500, 4), 0, \\amp.kr(0.1))".at(0).postcs
 .find($\t)
 
+g.charsTyped
 g.dump
 g.linesFromFile.postcs;
 g.typedLines.postcs;
+g.typedLines.size;
 g.evaluatedLines.postcs;
 g.linesExecuted
+
+g.calcEvaluatedLinesSize
+
 g.currentLineFromFileIndex.postcs
 g.currentLineTyped.postcs
 g.findNextChar
