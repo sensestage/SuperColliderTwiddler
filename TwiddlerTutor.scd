@@ -3,7 +3,8 @@ s.plotTree;
 
 
 // color of current line can be a mix of how well it is going. (red/green)
-// color management task in background (now there are delays in the code
+// color management task in background (now there are delays in the code)
+// tutor should skip empty lines (?) and just post commented lines
 
 // + fix number of lines that are displayed ---> or which ones are displayed.
 
@@ -18,9 +19,17 @@ g = TwiddlerTutor.new( ~config );
 
 (
 g.reset; g.updateWindow;
-g.loadFile( "testscore.scd".resolveRelative; );
+g.loadFile( "f0blog/2007-20-20-23h07-History-stripped_short.scd".resolveRelative );
+// g.loadFile( "testscore.scd".resolveRelative; );
 );
 
+(
+g.typedRightAction = { |char| char.postln; Synth.new( \right, [ \trig, 1, \dur, 0.75, \freq,rrand(3,10)*100 ] ); };
+g.typedWrongAction = { |char| char.postln; Synth.new( \wrong, [ \trig, 1, \dur, 0.75, \freq,300, \fmf, 60, \fma, 0.25 ] ); };
+g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 800, \fmf, 40, \fma, 0.1 ] ); };
+// Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 ); };
+);
+=
 
 g.noPrintLines
 
@@ -57,11 +66,6 @@ g.linesFromFile.drop(-1).reverseDo{ |it,i|
 
 g.evaluatedLines[0].split( $\n ).postcs;
 
-(
-g.typedRightAction = { Ndef( \right ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.75 ); };
-g.typedWrongAction = { Ndef( \wrong ).set( \trig, 1, \freq,300, \dur, 0.75, \fmf, 60, \fma, 0.25 ); };
-g.typedBackspaceAction = { Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 ); };
-);
 
 
 s
