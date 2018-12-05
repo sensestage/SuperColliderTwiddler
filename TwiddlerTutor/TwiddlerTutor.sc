@@ -333,23 +333,10 @@ TwiddlerTutor {
 		"CURRENT line:\t".post; currentLineTyped.postcs;
 		"from file line:\t".post; currentLineFromFile.postcs;
 		if ( currentLineTyped.notNil ){
-			// lastWord = currentLineTyped.split($ ).last;
-			// "LAST word: ".post; lastWord.postcs;
-			// if ( lastWord.size == 0 ){
 			lastWord = currentLineTyped;
 			"LAST word: ".post; lastWord.postcs;
-			// };
 			if ( currentLineFromFile.notNil ){
 				foundIndex = lastWord.size;
-				// foundIndex = currentLineFromFile.findBackwards( lastWord );
-				// foundIndex.postln;
-				// if ( foundIndex.notNil ){
-				// foundIndex = foundIndex + lastWord.size;
-				// foundIndex.postln;
-			// }{
-				// foundIndex = 0;
-				// foundIndex.postln;
-			// };
 				typingIndex = foundIndex;
 				foundIndex.postln;
 				if ( foundIndex == currentLineFromFile.size ){
@@ -412,23 +399,6 @@ TwiddlerTutor {
 			// oldString = lineToTypeW.string;
 		};
 
-		// handle multiline newlines...
-		/*
-		if ( newLine.isNil and: (evaluatedLines.size > 0) ){
-			oldNewLines = evaluatedLines.choose;
-			oldNewLines = oldNewLines.split( $\n ); // split into lines
-			oldNewLines.do{ |it|
-				linesFromFile.add( it ); // add each line to the linesFromFile
-			};
-			newLine = oldNewLines[0];
-		};
-		*/
-		/*
-		while( { oldString.first == $\n },{
-			oldString = oldString.drop(1);
-			oldString.postcs;
-		});
-		*/
 		"read next line - newline: ".post; newLine.postln;
 
 		if ( newLine.notNil ){
@@ -584,12 +554,9 @@ TwiddlerTutor {
 		this.reset;
 		if ( rehearseFile.notNil ){ rehearseFile.close; };
 		rehearseFile = File.open( fn, "r" );
-		// lineToTypeW.string_("");
 		this.readNextLine;
 		// typingIndex = 0;
 		if ( currentLineFromFile.size > 0 ){
-			// this.updateNextChar( lineToTypeW.string[typingIndex] );
-			// this.updateNextChar( currentLineFromFile[ typingIndex ] );
 			this.updateNextChar;
 		}
 	}
