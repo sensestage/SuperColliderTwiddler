@@ -90,6 +90,11 @@ TwiddlerTutor {
 
 	var nextToType, typing;
 
+	var <skipjackUpdater;
+	var <typedLast = \none;
+	var <evaluatedLast = \none;
+	var codeResult;
+
 	// actions
 	var <>typedRightAction;
 	var <>typedWrongAction;
@@ -122,14 +127,14 @@ TwiddlerTutor {
 
 	makeWindow{
 		// gui
-		window = Window.new("LivecodeTwiddlerTutor", Rect( 10, 10, 804, 784) );
+		window = Window.new("LivecodeTwiddlerTutor", Rect( 10, 10, 804, 746) );
 		window.front;
 		window.addFlowLayout( 2@2, 4@4 );
 
-		lineToTypeW = StaticText.new( window, Rect( 0,0, 800, 300 ) ).background_( Color.gray(0.95) );
+		lineToTypeW = StaticText.new( window, Rect( 0,0, 800, 280 ) ).background_( Color.gray(0.95) );
 		lineToTypeW.font_( Font.new( "Courier", 24) );
 
-		typed = StaticText.new( window, Rect( 0,0, 800, 300 ) ).background_( Color.white );
+		typed = StaticText.new( window, Rect( 0,0, 800, 280 ) ).background_( Color.white );
 		typed.font_( Font.new( "Courier", 24) );
 
 
@@ -170,10 +175,46 @@ TwiddlerTutor {
 		idsW.background_( Color.gray(0.8) ).align_( \center );
 
 
-		typing = TextField.new( window, Rect( 0,0, 800, 80 ) ).background_( Color.white );
+		typing = TextField.new( window, Rect( 0,0, 800, 60 ) ).background_( Color.white );
 		typing.font_( Font.new( "Courier", 24) );
 
 		// ~historyV = StaticText.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.grey( 0.9 ) );
+
+		skipjackUpdater = SkipJack.new( { this.updateColors }, 0.1, { window.isClosed }, "twiddlertutor" );
+	}
+
+	updateColors{
+		switch( evaluatedLast,
+			0, { evaluatedLast = evaluatedLast + 1;
+				typed.background_( Color.yellow );
+			},
+			1, { evaluatedLast = evaluatedLast + 1; },
+			2, { evaluatedLast = evaluatedLast + 1; },
+			3, { evaluatedLast = evaluatedLast + 1;
+				if ( codeResult ){
+					typed.background_( Color.green );
+					// typed.string_( "" );
+				}{
+					typed.background_( Color.red );
+				}
+			},
+			4, { evaluatedLast = evaluatedLast + 1; },
+			5, { evaluatedLast = evaluatedLast + 1; },
+			6, { evaluatedLast = -1;
+				typed.background_( Color.white );
+			}
+		);
+
+		switch( typedLast,
+			\none, { nextCharW.background_( Color.white ); },
+			\backspace, { nextCharW.background_( Color.yellow ); typedLast = 0; },
+			\right, { nextCharW.background_( Color.green ); typedLast = 0; },
+			\wrong, { nextCharW.background_( Color.red ); typedLast = 0; },
+			0, { typedLast = typedLast + 1; },
+			1, { typedLast = typedLast + 1; },
+			2, { typedLast = typedLast + 1; },
+			3, { typedLast = \none }
+		);
 	}
 
 	updateWindow {
@@ -186,7 +227,6 @@ TwiddlerTutor {
 		if ( keyUpAction.notNil ){ typing.removeAction( keyUpAction, \keyUpAction ); };
 		keyUpAction = { arg field, char, mods;
 			var lastTyped = field.string.last;
-			var codeResult;
 			"TYPING ACTION: ".post; lastTyped.postln;
 			charsTyped = charsTyped + 1;
 			charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
@@ -222,42 +262,23 @@ TwiddlerTutor {
 						currentLineTyped = typing.string;
 
 						if ( currentLineTyped.size > 0 ){
-							"from index: ".post; currentLineFromFileIndex.postln;
+							"from index: ".post;
+							currentLineFromFileIndex.postln;
 							typedLines = typedLines.add( [ currentLineFromFileIndex, currentLineTyped ] );
 						};
 						typing.string = "";
 						currentLineTyped = "";
-						// char = $\n;
-
-						this.setStringLineTyped;
 
 						if ( mods == 262144 ){ // ctrl+enter
 							"~~~ ctrl+enter".postln;
-							Routine({
-								typed.background_( Color.yellow );
-								codeResult = this.evaluateTyped;
-								0.2.wait;
-								if ( codeResult.not ){
-									typed.background_( Color.red );
-									0.2.wait;
-								}{
-									typed.background_( Color.green );
-									0.2.wait;
-									typed.string_( "" );
-									this.readNextLine;
-									this.setStringLineTyped;
-									this.updateNextChar;
-								};
-								typed.background_( Color.white );
-							}).play(AppClock);
-
-						}{
-							// just enter
-							"~~~ enter".postln;
-							this.readNextLine;
-							this.setStringLineTyped;
-							this.updateNextChar;
+							evaluatedLast = 0;
+							codeResult = this.evaluateTyped;
 						};
+						// just enter
+						"~~~ enter".postln;
+						this.readNextLine;
+						this.setStringLineTyped;
+						this.updateNextChar;
 					}{
 						"~~~ other char".postln;
 						currentLineTyped = typing.string;
@@ -305,24 +326,16 @@ TwiddlerTutor {
 
 	checkCharacter{ |char|
 		if ( char == nextToType ){
-			Routine({
-				nextCharW.background_( Color.green );
-				typedRightAction.value( char );
-				0.2.wait;
-				nextCharW.background_( Color.white );
-			}).play( AppClock );
+			typedLast = \right;
+			typedRightAction.value( char );
 		}{
-			Routine({
-				if( char == 8.asAscii ){
-					nextCharW.background_( Color.yellow );
-					typedBackspaceAction.value;
-				}{
-					nextCharW.background_( Color.red );
-					typedWrongAction.value( char );
-				};
-				0.2.wait;
-				nextCharW.background_( Color.white );
-			}).play( AppClock );
+			if( char == 8.asAscii ){
+				typedLast = \backspace;
+				typedBackspaceAction.value;
+			}{
+				typedLast = \wrong;
+				typedWrongAction.value( char );
+			};
 		};
 	}
 
