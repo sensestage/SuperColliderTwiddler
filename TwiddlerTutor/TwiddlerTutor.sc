@@ -284,30 +284,9 @@ TwiddlerTutor {
 		// only need to do something when going back a line...
 		if ( currentLineTyped.size == 0 ){
 			// get previous line
-			/*
-			if ( typedLines.size == 0 ){
-				currentLineTyped = "";
-				currentLineFromFileIndex = linesExecuted;
-				currentLineFromFile = linesFromFile[ linesExecuted ];
-				"reset to lines executed".postln;
-			}
-			*/
 			if ( typedLines.size != 0 ){ // otherwise nothing to backspace to
 				// currentLineFromFileIndex = currentLineFromFileIndex - 2;
 				// "index ".post; currentLineFromFileIndex.postln;
-				/*
-				if ( currentLineFromFileIndex <= linesExecuted ){
-					"reset to lines executed".postln;
-
-					currentLineFromFileIndex = linesExecuted;
-					currentLineFromFile = linesFromFile[ linesExecuted ];
-
-					"index ".post; currentLineFromFileIndex.postln;
-					currentLineFromFile.postln;
-
-					typedLines = []; // reset
-					currentLineTyped = "";
-				}{*/
 				"go to previous line".postln;
 				currentLineFromFileIndex = typedLines.last[0];
 				currentLineFromFile = linesFromFile[ currentLineFromFileIndex ];
@@ -323,33 +302,6 @@ TwiddlerTutor {
 			currentLineTyped = typing.string;
 		};
 	}
-
-	/*
-	characterTyped { |char|
-		var oldString = typed.string;
-		currentLineTyped = typing.string;
-		"==TYPING: ".postln; currentLineTyped.postcs;
-		// "==TYPED: ".postln; oldString.postcs;
-		if ( char != 8.asAscii ){ // backspace
-			if( char == $\r ){
-				"<newline>".postln;
-				if ( currentLineTyped.size > 0 ){
-					typedLines = typedLines.add( currentLineTyped );
-					// typedLines.postcs;
-				};
-				typing.string = "";
-				currentLineTyped = "";
-				char = $\n;
-			};
-			// if ( typed.string.size == 0 and: (char==$\n) ){
-			// 	"typed size = 0, not adding \n".postln;
-			// }{
-			// 	typed.string = ( oldString ++ char );
-			// };
-		};
-		this.setStringLineTyped;
-		// "==TYPED-2: ".postln; oldString.postcs;
-	}*/
 
 	checkCharacter{ |char|
 		if ( char == nextToType ){
