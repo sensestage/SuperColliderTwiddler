@@ -94,6 +94,8 @@ TwiddlerTutor {
 	var <typedLast = \none;
 	var <evaluatedLast = \none;
 	var codeResult;
+	var recodeResult;
+	var recodeLines;
 
 	// actions
 	var <>typedRightAction;
@@ -205,6 +207,19 @@ TwiddlerTutor {
 			}
 		);
 
+		switch( recodeResult,
+			true, {
+				typed.background_( Color.green(0.8) );
+				evaluatedLast = 4;
+				recodeResult = nil;
+			},
+			false, {
+				typed.background_( Color.red(0.8) );
+				evaluatedLast = 4;
+				recodeResult = nil;
+			}
+		);
+
 		switch( typedLast,
 			\none, { nextCharW.background_( Color.white ); },
 			\backspace, { nextCharW.background_( Color.yellow ); typedLast = 0; },
@@ -260,30 +275,37 @@ TwiddlerTutor {
 					// this.characterTyped( lastTyped );
 					if( char == $\r ){ // enter
 						currentLineTyped = typing.string;
-
+						currentLineTyped.postcs;
+						currentLineTyped.size.postln;
 						if ( currentLineTyped.size > 0 ){
 							"from index: ".post;
 							currentLineFromFileIndex.postln;
 							typedLines = typedLines.add( [ currentLineFromFileIndex, currentLineTyped ] );
-						};
-						typing.string = "";
-						currentLineTyped = "";
+							typing.string = "";
+							currentLineTyped = "";
 
-						if ( mods == 262144 ){ // ctrl+enter
-							"~~~ ctrl+enter".postln;
-							evaluatedLast = 0;
-							codeResult = this.evaluateTyped;
+							if ( mods == 262144 ){ // ctrl+enter
+								"~~~ ctrl+enter".postln;
+								evaluatedLast = 0;
+								codeResult = this.evaluateTyped;
+							};
+							// just enter
+							"~~~ enter".postln;
+							this.readNextLine;
+							this.setStringLineTyped;
+							this.updateNextChar;
 						};
-						// just enter
-						"~~~ enter".postln;
-						this.readNextLine;
-						this.setStringLineTyped;
-						this.updateNextChar;
 					}{
-						"~~~ other char".postln;
-						currentLineTyped = typing.string;
-						this.setStringLineTyped;
-						this.updateNextChar;
+						if ( mods == 524288 and: char.isDecDigit ){ // ALT + number
+							this.reevaluateLine( char.digit );
+							currentLineTyped = typing.string.drop( -1 );
+							typing.string_( currentLineTyped );
+						}{
+							"~~~ other char".postln;
+							currentLineTyped = typing.string;
+							this.setStringLineTyped;
+							this.updateNextChar;
+						};
 					}
 				}
 			}
@@ -295,6 +317,23 @@ TwiddlerTutor {
 	findMatchingLine{
 		"--- find matching line ---".postln;
 		"currentTyped".post; currentLineTyped.postln;
+
+	}
+
+	reevaluateLine{ |index|
+		var codeString, codeFunc;
+		codeString = evaluatedLines.wrapAt( -1 * index );
+
+		"---RE-EVALUATING---".postln;
+		codeString.postcs;
+		"-----------------".postln;
+		codeFunc = codeString.compile;
+		if ( codeFunc.notNil ){
+			recodeResult = true;
+			codeFunc.value;
+		}{
+			recodeResult=false;
+		};
 
 	}
 
