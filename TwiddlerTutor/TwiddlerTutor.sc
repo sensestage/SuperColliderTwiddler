@@ -242,11 +242,11 @@ TwiddlerTutor {
 		if ( keyUpAction.notNil ){ typing.removeAction( keyUpAction, \keyUpAction ); };
 		keyUpAction = { arg field, char, mods;
 			var lastTyped = field.string.last;
-			"TYPING ACTION: ".post; lastTyped.postln;
+			// "TYPING ACTION: ".post; lastTyped.postln;
 			charsTyped = charsTyped + 1;
 			charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
 			if ( char == 8.asAscii ){ // backspace
-				"typing action backspace".postln;
+				// "typing action backspace".postln;
 				lastCharW.string_( "<--" );
 				this.typedBackspace;
 				this.setStringLineTyped;
@@ -254,7 +254,7 @@ TwiddlerTutor {
 				this.updateNextChar;
 			}{
 				if ( char != 0.asAscii ){
-					[ mods, char, lastTyped ].postcs;
+					// [ mods, char, lastTyped ].postcs;
 					// process character other than backspace
 					if ( char == $\r ){
 						lastTyped = $\r;
@@ -275,22 +275,22 @@ TwiddlerTutor {
 					// this.characterTyped( lastTyped );
 					if( char == $\r ){ // enter
 						currentLineTyped = typing.string;
-						currentLineTyped.postcs;
-						currentLineTyped.size.postln;
+						// currentLineTyped.postcs;
+						// currentLineTyped.size.postln;
 						if ( currentLineTyped.size > 0 ){
-							"from index: ".post;
-							currentLineFromFileIndex.postln;
+							// "from index: ".post;
+							// currentLineFromFileIndex.postln;
 							typedLines = typedLines.add( [ currentLineFromFileIndex, currentLineTyped ] );
 							typing.string = "";
 							currentLineTyped = "";
 
 							if ( mods == 262144 ){ // ctrl+enter
-								"~~~ ctrl+enter".postln;
+								// "~~~ ctrl+enter".postln;
 								evaluatedLast = 0;
 								codeResult = this.evaluateTyped;
 							};
 							// just enter
-							"~~~ enter".postln;
+							// "~~~ enter".postln;
 							this.readNextLine;
 							this.setStringLineTyped;
 							this.updateNextChar;
@@ -300,8 +300,9 @@ TwiddlerTutor {
 							this.reevaluateLine( char.digit );
 							currentLineTyped = typing.string.drop( -1 );
 							typing.string_( currentLineTyped );
+							this.setStringLineTyped;
 						}{
-							"~~~ other char".postln;
+							// "~~~ other char".postln;
 							currentLineTyped = typing.string;
 							this.setStringLineTyped;
 							this.updateNextChar;
@@ -314,11 +315,10 @@ TwiddlerTutor {
 		typing.addAction( keyUpAction, \keyUpAction );
 	}
 
-	findMatchingLine{
-		"--- find matching line ---".postln;
-		"currentTyped".post; currentLineTyped.postln;
-
-	}
+	// findMatchingLine{
+	// 	"--- find matching line ---".postln;
+	// 	"currentTyped".post; currentLineTyped.postln;
+	// }
 
 	reevaluateLine{ |index|
 		var codeString, codeFunc;
@@ -339,22 +339,20 @@ TwiddlerTutor {
 
 	typedBackspace {
 		var prevTyped = currentLineTyped;
-		"==TYPING backpace: ".postln; currentLineTyped.postcs;
-		"typed lines ".post; typedLines.size.postln; typedLines.postcs;
+		// "==TYPING backpace: ".postln; currentLineTyped.postcs;
+		// "typed lines ".post; typedLines.size.postln; typedLines.postcs;
 		// only need to do something when going back a line...
 		if ( currentLineTyped.size == 0 ){
 			// get previous line
 			if ( typedLines.size != 0 ){ // otherwise nothing to backspace to
-				// currentLineFromFileIndex = currentLineFromFileIndex - 2;
-				// "index ".post; currentLineFromFileIndex.postln;
-				"go to previous line".postln;
+				// "go to previous line".postln;
 				currentLineFromFileIndex = typedLines.last[0];
 				currentLineFromFile = linesFromFile[ currentLineFromFileIndex ];
 				currentLineTyped = typedLines.last[1];
 				// increase it again as it always points to the NEXT line: // ?
 				// currentLineFromFileIndex = currentLineFromFileIndex + 1;
-				"index ".post; currentLineFromFileIndex.postln;
-				currentLineFromFile.postln;
+				// "index ".post; currentLineFromFileIndex.postln;
+				// currentLineFromFile.postln;
 				typedLines = typedLines.drop(-1); // drop the last of the typed lines;
 			};
 			typing.string_( currentLineTyped );
@@ -382,22 +380,22 @@ TwiddlerTutor {
 		var foundIndex;
 		var lastWord;
 		var foundChar;
-		"CURRENT line:\t".post; currentLineTyped.postcs;
-		"from file line:\t".post; currentLineFromFile.postcs;
+		// "CURRENT line:\t".post; currentLineTyped.postcs;
+		// "from file line:\t".post; currentLineFromFile.postcs;
 		if ( currentLineTyped.notNil ){
 			lastWord = currentLineTyped;
-			"LAST word: ".post; lastWord.postcs;
+			// "LAST word: ".post; lastWord.postcs;
 			if ( currentLineFromFile.notNil ){
 				foundIndex = lastWord.size;
 				typingIndex = foundIndex;
-				foundIndex.postln;
+				// foundIndex.postln;
 				if ( foundIndex == currentLineFromFile.size ){
 					foundChar = $\r;
-					foundChar.postcs;
+					// foundChar.postcs;
 					^foundChar;
 				};
 				foundChar = currentLineFromFile[typingIndex];
-				foundChar.postcs;
+				// foundChar.postcs;
 				^foundChar;
 			};
 		};
@@ -430,10 +428,10 @@ TwiddlerTutor {
 		var newLine, oldString;
 		var oldNewLines;
 		currentLineFromFile = "";
-		"read NEXT line from index: ".post; currentLineFromFileIndex.postln;
+		// "read NEXT line from index: ".post; currentLineFromFileIndex.postln;
 		// check if we are at the last line of our linesFromFile
 		currentLineFromFileIndex = currentLineFromFileIndex+1;
-		"to index: ".post; currentLineFromFileIndex.postln;
+		// "to index: ".post; currentLineFromFileIndex.postln;
 		if ( currentLineFromFileIndex < linesFromFile.size ){
 			newLine = linesFromFile[ currentLineFromFileIndex ];
 		}{
@@ -451,7 +449,7 @@ TwiddlerTutor {
 			// oldString = lineToTypeW.string;
 		};
 
-		"read next line - newline: ".post; newLine.postln;
+		// "read next line - newline: ".post; newLine.postln;
 
 		if ( newLine.notNil ){
 			// typingIndex = 0;
@@ -460,8 +458,7 @@ TwiddlerTutor {
 			// linesFromFile = linesFromFile.add( currentLineFromFile );
 			this.setStringLineToType;
 		};
-		// lineToTypeW.string_( oldString ++ "\n" ++ newLine );
-		"lines: ".post; linesFromFile.size.postln;
+		// "lines: ".post; linesFromFile.size.postln;
 	}
 
 	setStringLineToType {
@@ -502,7 +499,7 @@ TwiddlerTutor {
 		var collectedLines;
 		var evIndex;
 
-		"---STRING line typed".postln;
+		// "---STRING line typed".postln;
 		totalLines = typedLines.size;
 
 		if ( totalLines < (noPrintLines-1) and: (evaluatedLines.size != 0) ){
@@ -510,25 +507,25 @@ TwiddlerTutor {
 			evIndex = evaluatedLines.size;
 			while ( { totalLines < (noPrintLines-1) },{
 				evIndex = evIndex - 1;
-				"evaluatedLine: ".post; evIndex.post; " ".post; evaluatedLines.at( evIndex ).postln;
+				// "evaluatedLine: ".post; evIndex.post; " ".post; evaluatedLines.at( evIndex ).postln;
 				if ( evaluatedLines.at( evIndex ).notNil ){
 					splitstring = evaluatedLines.at( evIndex ).split( $\n );
-					splitstring.postcs;
+					// splitstring.postcs;
 					splitstring.reverseDo{ |jt,j|
 						if ( jt.size > 0 ){
 							collectedLines = collectedLines.add( jt );
 						};
-						totalLines.post; "-".post;
-						collectedLines.postln;
+						// totalLines.post; "-".post;
+						// collectedLines.postln;
 						totalLines = totalLines + 1;
 					};
 				}{
 					totalLines = noPrintLines;
 				};
 			});
-			"collected lines: ".post;
-			collectedLines.size.postln;
-			collectedLines.postcs;
+			// "collected lines: ".post;
+			// collectedLines.size.postln;
+			// collectedLines.postcs;
 
 			if ( typedLines.size + collectedLines.size > (noPrintLines-1) ){
 				// only keep last ones of collectedLines.
@@ -539,15 +536,13 @@ TwiddlerTutor {
 				collectedLines.postcs;
 			};
 			offset = linesExecuted - collectedLines.size + 1;
-			"offset ".post; offset.postln;
+			// "offset ".post; offset.postln;
 			collectedLines.reverseDo{ |it,i|
 				string = string ++ (offset).asString.padLeft(4,"=") ++ "|";
 				string = string + it;
 				string = string ++ "\n";
 				offset = offset + 1;
 			};
-			"offset ".post; offset.postln;
-			// offset = offset - 1;
 			// "offset ".post; offset.postln;
 			typedLines.do{ |it,i|
 				string = string ++ (i+offset).asString.padLeft(4,"-") ++ "|";
