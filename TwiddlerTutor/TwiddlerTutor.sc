@@ -77,10 +77,12 @@ TwiddlerTutor {
 	var <codeFunc;
 
 	// gui
-	var noPrintLines = 10; // 7; at size 200
+	var noPrintLines = 8; // 7; at size 200
+	var noPrintLinesEval = 12; // 7; at size 200
 
 	var window;
 	var <lineToTypeW, <typed;
+	var <evaluatedW;
 	var spacer1, spacer2;
 	var nextCharW, nextCharCodeW, buttonView, buttons;
 	var charsTypedW;
@@ -93,9 +95,12 @@ TwiddlerTutor {
 	var <skipjackUpdater;
 	var <typedLast = \none;
 	var <evaluatedLast = \none;
+	var <reevaluatedLast = \none;
 	var codeResult;
-	var recodeResult;
+	var recodeResult = false;
 	var recodeLines;
+
+	var defaultHiLiteColor;
 
 	// actions
 	var <>typedRightAction;
@@ -104,11 +109,14 @@ TwiddlerTutor {
 
 
 
+
+
 	*new{ |config|
 		^super.new.init( config );
 	}
 
 	init{ |cfg|
+		defaultHiLiteColor = Color(0.29803921568627, 0.49803921568627, 0.74901960784314);
 		config = cfg;
 		typingIndex = 0;
 		this.reset;
@@ -133,11 +141,14 @@ TwiddlerTutor {
 		window.front;
 		window.addFlowLayout( 2@2, 4@4 );
 
-		lineToTypeW = StaticText.new( window, Rect( 0,0, 800, 280 ) ).background_( Color.gray(0.95) );
-		lineToTypeW.font_( Font.new( "Courier", 24) );
 
-		typed = StaticText.new( window, Rect( 0,0, 800, 280 ) ).background_( Color.white );
-		typed.font_( Font.new( "Courier", 24) );
+		// just one line
+		lineToTypeW = TextField.new( window, Rect( 0,0, 800, 50 ) ).background_( Color.gray(0.95) );
+		lineToTypeW.font_( Font.new( "Courier", 22) ).canFocus_( false );
+
+
+		typing = TextField.new( window, Rect( 0,0, 800, 70 ) ).background_( Color.white );
+		typing.font_( Font.new( "Courier", 22) );
 
 
 		lastCharW = StaticText.new( window, Rect( 0, 0, 95, 86 ) );
@@ -177,8 +188,19 @@ TwiddlerTutor {
 		idsW.background_( Color.gray(0.8) ).align_( \center );
 
 
-		typing = TextField.new( window, Rect( 0,0, 800, 60 ) ).background_( Color.white );
-		typing.font_( Font.new( "Courier", 24) );
+
+
+		typed = ListView.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.white );
+		typed.font_( Font.new( "Courier", 20) );
+
+
+		evaluatedW = ListView.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.gray(0.95) );
+		evaluatedW.font_( Font.new( "Courier", 20) ).hiliteColor_(defaultHiLiteColor);
+
+
+
+
+
 
 		// ~historyV = StaticText.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.grey( 0.9 ) );
 
@@ -186,6 +208,29 @@ TwiddlerTutor {
 	}
 
 	updateColors{
+
+		switch( reevaluatedLast,
+			0, {
+				reevaluatedLast = reevaluatedLast + 1;
+				evaluatedW.hiliteColor_(Color.yellow)
+			},
+			1, { reevaluatedLast = reevaluatedLast + 1; },
+			2, { reevaluatedLast = reevaluatedLast + 1; },
+			3, {
+				reevaluatedLast = reevaluatedLast + 1;
+				if ( recodeResult ){
+					evaluatedW.hiliteColor_(Color.green)
+				}{
+					evaluatedW.hiliteColor_(Color.red)
+				}
+			},
+			4, { reevaluatedLast = reevaluatedLast + 1; },
+			5, { reevaluatedLast = reevaluatedLast + 1; },
+			6, { reevaluatedLast = reevaluatedLast + 1;
+				evaluatedW.hiliteColor_(defaultHiLiteColor)
+			}
+		);
+
 		switch( evaluatedLast,
 			0, { evaluatedLast = evaluatedLast + 1;
 				typed.background_( Color.yellow );
@@ -207,6 +252,7 @@ TwiddlerTutor {
 			}
 		);
 
+		/*
 		switch( recodeResult,
 			true, {
 				typed.background_( Color.green(0.8) );
@@ -219,6 +265,7 @@ TwiddlerTutor {
 				recodeResult = nil;
 			}
 		);
+		*/
 
 		switch( typedLast,
 			\none, { nextCharW.background_( Color.white ); },
@@ -236,6 +283,7 @@ TwiddlerTutor {
 		charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
 		this.setStringLineToType;
 		this.setStringLineTyped;
+		// this.setStringEvaluated;
 	}
 
 	setTypingAction {
@@ -245,12 +293,14 @@ TwiddlerTutor {
 			// "TYPING ACTION: ".post; lastTyped.postln;
 			charsTyped = charsTyped + 1;
 			charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
+
+			this.checkCharacter( char ); // was this the right character?
+
 			if ( char == 8.asAscii ){ // backspace
 				// "typing action backspace".postln;
 				lastCharW.string_( "<--" );
 				this.typedBackspace;
 				this.setStringLineTyped;
-				this.checkCharacter( char ); // was this the right character?
 				this.updateNextChar;
 			}{
 				if ( char != 0.asAscii ){
@@ -270,24 +320,18 @@ TwiddlerTutor {
 						lastTyped = char;
 					};
 					lastCharW.string_( lastTyped.asCompileString );
-
-					this.checkCharacter( lastTyped ); // was this the right character?
-					// this.characterTyped( lastTyped );
+					// this.checkCharacter( lastTyped ); // was this the right character?
 					if( char == $\r ){ // enter
 						currentLineTyped = typing.string;
-						// currentLineTyped.postcs;
-						// currentLineTyped.size.postln;
 						if ( currentLineTyped.size > 0 ){
-							// "from index: ".post;
-							// currentLineFromFileIndex.postln;
 							typedLines = typedLines.add( [ currentLineFromFileIndex, currentLineTyped ] );
 							typing.string = "";
 							currentLineTyped = "";
-
 							if ( mods == 262144 ){ // ctrl+enter
 								// "~~~ ctrl+enter".postln;
 								evaluatedLast = 0;
 								codeResult = this.evaluateTyped;
+								this.setStringEvaluated;
 							};
 							// just enter
 							// "~~~ enter".postln;
@@ -301,10 +345,12 @@ TwiddlerTutor {
 							currentLineTyped = typing.string.drop( -1 );
 							typing.string_( currentLineTyped );
 							this.setStringLineTyped;
+							this.setStringEvaluated;
 						}{
 							// "~~~ other char".postln;
 							currentLineTyped = typing.string;
 							this.setStringLineTyped;
+							this.setStringEvaluated;
 							this.updateNextChar;
 						};
 					}
@@ -322,6 +368,8 @@ TwiddlerTutor {
 
 	reevaluateLine{ |index|
 		var codeString, codeFunc;
+		index.postln;
+		evaluatedW.selection_( [ index - 1 ] );
 		codeString = evaluatedLines.wrapAt( -1 * index );
 
 		"---RE-EVALUATING---".postln;
@@ -334,7 +382,7 @@ TwiddlerTutor {
 		}{
 			recodeResult=false;
 		};
-
+		reevaluatedLast = 0;
 	}
 
 	typedBackspace {
@@ -374,6 +422,7 @@ TwiddlerTutor {
 				typedWrongAction.value( char );
 			};
 		};
+		^typedLast;
 	}
 
 	findNextChar{
@@ -462,6 +511,7 @@ TwiddlerTutor {
 	}
 
 	setStringLineToType {
+		/*
 		var string = "";
 		var totalLines = linesFromFile.size;
 		var lineOffset = (totalLines - noPrintLines).max(0);
@@ -478,6 +528,8 @@ TwiddlerTutor {
 			string = string ++ "\n";
 		};
 		lineToTypeW.string_( string );
+		*/
+		lineToTypeW.string_( currentLineFromFile );
 	}
 
 	calcEvaluatedLinesSize{
@@ -491,17 +543,94 @@ TwiddlerTutor {
 		^size;
 	}
 
-	setStringLineTyped {
-		var string = "";
-		var offset = 0;
+	setStringEvaluated {
+		var itemsForView;
 		var splitstring;
-		var totalLines;
+		var index;
+		var itemString;
+		var curSelected = evaluatedW.selection;
+		var curItemSize = evaluatedW.items.size;
+		"currently selected: ".post; curSelected.postln;
+		"current no. of items: ".post; curItemSize.postln;
+		itemsForView = evaluatedLines.collect{ |it,i|
+			splitstring = it.split( $\n );
+			index = (evaluatedLines.size - i);
+			splitstring.do{ |jt,j|
+				if ( j==0 ){
+					itemString = index.asString.padLeft(4," ") ++ "|" ++ jt
+				}{
+					itemString = itemString ++ "\n" ++ "|".padLeft(5," ") ++ jt
+				}
+			};
+			itemString;
+		};
+		evaluatedW.items_( itemsForView.reverse );
+		"new no. of items: ".post; itemsForView.size.postln;
+		if ( curItemSize < itemsForView.size ){
+			curSelected = curSelected + itemsForView.size - curItemSize;
+		};
+		evaluatedW.selection_( curSelected );
+		// evaluatedW.selection_( [ itemsForView.size - 1 ] ); // select last item
+		// evaluatedW.value_( [ itemsForView.size - 1 ] ); // select last item
+
+		/*
+		var string = "";
+		var splitstring;
+		var totalLines = 0;
 		var collectedLines;
 		var evIndex;
+		var offset = 0;
 
-		// "---STRING line typed".postln;
-		totalLines = typedLines.size;
+		if ( evaluatedLines.size > 0 ){
+			collectedLines = [];
+			evIndex = evaluatedLines.size;
+			while ( { totalLines < (noPrintLinesEval-1) },{
+				evIndex = evIndex - 1;
+				offset = offset + 1;
+				if ( evaluatedLines.at( evIndex ).notNil ){
+					splitstring = evaluatedLines.at( evIndex ).split( $\n );
+					splitstring.reverseDo{ |jt,j|
+						if ( jt.size > 0 ){
+							collectedLines = collectedLines.add( [offset, jt] );
+						};
+						totalLines = totalLines + 1;
+					};
+				}{
+					totalLines = noPrintLinesEval;
+				};
+			});
+			if ( collectedLines.size > (noPrintLinesEval-1) ){
+				// only keep last ones of collectedLines.
+				collectedLines = collectedLines.keep( noPrintLinesEval - 1 - typedLines.size );
+				"resized collected lines: ".post;
+				collectedLines.size.postln;
+				collectedLines.postcs;
+			};
+			// offset = linesExecuted - collectedLines.size + 1;
+			// "offset ".post; offset.postln;
+			collectedLines.reverseDo{ |it,i|
+				string = string ++ (it[0]).asString.padLeft(4," ") ++ "|";
+				string = string + it[1];
+				string = string ++ "\n";
+				// offset = offset + 1;
+			};
+		};
+		*/
+		// evaluatedW.string_( string );
+	}
 
+	setStringLineTyped {
+		// var string = "";
+		// var offset = 0;
+		// // var splitstring;
+		// var totalLines;
+		// // var collectedLines;
+		// // var evIndex;
+		//
+		// // "---STRING line typed".postln;
+		// totalLines = typedLines.size;
+
+		/*
 		if ( totalLines < (noPrintLines-1) and: (evaluatedLines.size != 0) ){
 			collectedLines = [];
 			evIndex = evaluatedLines.size;
@@ -550,18 +679,29 @@ TwiddlerTutor {
 				string = string ++ "\n";
 			};
 		}{
-			// only typed lines
-			offset = (totalLines - noPrintLines + 1).max(0);
-			typedLines.copyToEnd( offset ).do{ |it,i|
-				string = string ++ (i+offset+linesExecuted).asString.padLeft(4,"-") ++ "|";
-				string = string + it[1];
-				string = string ++ "\n";
-			};
-		};
 
-		string = string ++ (currentLineFromFileIndex+1).asString.padLeft(4,"*") ++ "|";
-		string = string + typing.string;
-		typed.string_( string );
+		*/
+			// only typed lines
+		// offset = (totalLines - noPrintLines + 1).max(0);
+		// typedLines.copyToEnd( offset ).do{ |it,i|
+		// 	string = string ++ (i+offset+linesExecuted+1).asString.padLeft(4," ") ++ "|";
+		// 	string = string + it[1];
+		// 	string = string ++ "\n";
+		// };
+	// };
+
+		// string = string ++ (currentLineFromFileIndex+1).asString.padLeft(4,"*") ++ "|";
+		// string = string + typing.string;
+		// typed.string_( string );
+
+		var itemsForView;
+		var string;
+		itemsForView = typedLines.collect{ |it,i|
+			(it[0]+1).asString.padLeft(4," ") ++ "|" ++ it[1]
+		};
+		itemsForView = itemsForView.add( (currentLineFromFileIndex+1).asString.padLeft(4,"*") ++ "|" ++ typing.string );
+		typed.items_( itemsForView );
+		// typed.selection_( [ itemsForView.size - 1 ] ); // select last item
 
 		// ids string
 		string = "";
@@ -577,7 +717,10 @@ TwiddlerTutor {
 		var result;
 		var codeString = "";
 		typedLines.do{ |it,i|
-			codeString = codeString ++ it[1] ++ "\n";
+			codeString = codeString ++ it[1];
+			if ( i < (typedLines.size-1) ){
+				codeString = codeString ++ "\n";
+			}
 		};
 		// linesExecuted = currentLineFromFileIndex;
 		"----EVALUATING---".postln;
