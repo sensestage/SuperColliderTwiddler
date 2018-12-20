@@ -245,21 +245,6 @@ TwiddlerTutor {
 			}
 		);
 
-		/*
-		switch( recodeResult,
-			true, {
-				typed.background_( Color.green(0.8) );
-				evaluatedLast = 4;
-				recodeResult = nil;
-			},
-			false, {
-				typed.background_( Color.red(0.8) );
-				evaluatedLast = 4;
-				recodeResult = nil;
-			}
-		);
-		*/
-
 		switch( typedLast,
 			\none, { nextCharW.background_( Color.white ); },
 			\backspace, { nextCharW.background_( Color.yellow ); typedLast = 0; },
@@ -353,11 +338,6 @@ TwiddlerTutor {
 
 		typing.addAction( keyUpAction, \keyUpAction );
 	}
-
-	// findMatchingLine{
-	// 	"--- find matching line ---".postln;
-	// 	"currentTyped".post; currentLineTyped.postln;
-	// }
 
 	reevaluateLine{ |index|
 		var codeString, codeFunc;
@@ -504,24 +484,6 @@ TwiddlerTutor {
 	}
 
 	setStringLineToType {
-		/*
-		var string = "";
-		var totalLines = linesFromFile.size;
-		var lineOffset = (totalLines - noPrintLines).max(0);
-		if ( currentLineFromFileIndex < lineOffset ){
-			lineOffset = (currentLineFromFileIndex - noPrintLines + 2);
-		};
-		linesFromFile.copyRange( lineOffset, lineOffset + noPrintLines - 1 ).do{ |it,i|
-			if ( currentLineFromFileIndex == (lineOffset + i+1) ){
-				string = string ++ (lineOffset + i+1).asString.padLeft(4,"*") ++ "|";
-			}{
-				string = string ++ (lineOffset + i+1).asString.padLeft(4) ++ "|";
-			};
-			string = string + it;
-			string = string ++ "\n";
-		};
-		lineToTypeW.string_( string );
-		*/
 		lineToTypeW.string_( currentLineFromFile );
 	}
 
@@ -563,130 +525,9 @@ TwiddlerTutor {
 			curSelected = curSelected + itemsForView.size - curItemSize;
 		};
 		evaluatedW.selection_( curSelected );
-		// evaluatedW.selection_( [ itemsForView.size - 1 ] ); // select last item
-		// evaluatedW.value_( [ itemsForView.size - 1 ] ); // select last item
-
-		/*
-		var string = "";
-		var splitstring;
-		var totalLines = 0;
-		var collectedLines;
-		var evIndex;
-		var offset = 0;
-
-		if ( evaluatedLines.size > 0 ){
-			collectedLines = [];
-			evIndex = evaluatedLines.size;
-			while ( { totalLines < (noPrintLinesEval-1) },{
-				evIndex = evIndex - 1;
-				offset = offset + 1;
-				if ( evaluatedLines.at( evIndex ).notNil ){
-					splitstring = evaluatedLines.at( evIndex ).split( $\n );
-					splitstring.reverseDo{ |jt,j|
-						if ( jt.size > 0 ){
-							collectedLines = collectedLines.add( [offset, jt] );
-						};
-						totalLines = totalLines + 1;
-					};
-				}{
-					totalLines = noPrintLinesEval;
-				};
-			});
-			if ( collectedLines.size > (noPrintLinesEval-1) ){
-				// only keep last ones of collectedLines.
-				collectedLines = collectedLines.keep( noPrintLinesEval - 1 - typedLines.size );
-				"resized collected lines: ".post;
-				collectedLines.size.postln;
-				collectedLines.postcs;
-			};
-			// offset = linesExecuted - collectedLines.size + 1;
-			// "offset ".post; offset.postln;
-			collectedLines.reverseDo{ |it,i|
-				string = string ++ (it[0]).asString.padLeft(4," ") ++ "|";
-				string = string + it[1];
-				string = string ++ "\n";
-				// offset = offset + 1;
-			};
-		};
-		*/
-		// evaluatedW.string_( string );
 	}
 
 	setStringLineTyped {
-		// var string = "";
-		// var offset = 0;
-		// // var splitstring;
-		// var totalLines;
-		// // var collectedLines;
-		// // var evIndex;
-		//
-		// // "---STRING line typed".postln;
-		// totalLines = typedLines.size;
-
-		/*
-		if ( totalLines < (noPrintLines-1) and: (evaluatedLines.size != 0) ){
-			collectedLines = [];
-			evIndex = evaluatedLines.size;
-			while ( { totalLines < (noPrintLines-1) },{
-				evIndex = evIndex - 1;
-				// "evaluatedLine: ".post; evIndex.post; " ".post; evaluatedLines.at( evIndex ).postln;
-				if ( evaluatedLines.at( evIndex ).notNil ){
-					splitstring = evaluatedLines.at( evIndex ).split( $\n );
-					// splitstring.postcs;
-					splitstring.reverseDo{ |jt,j|
-						if ( jt.size > 0 ){
-							collectedLines = collectedLines.add( jt );
-						};
-						// totalLines.post; "-".post;
-						// collectedLines.postln;
-						totalLines = totalLines + 1;
-					};
-				}{
-					totalLines = noPrintLines;
-				};
-			});
-			// "collected lines: ".post;
-			// collectedLines.size.postln;
-			// collectedLines.postcs;
-
-			if ( typedLines.size + collectedLines.size > (noPrintLines-1) ){
-				// only keep last ones of collectedLines.
-				collectedLines = collectedLines.keep( noPrintLines - 1 - typedLines.size );
-
-				"resized collected lines: ".post;
-				collectedLines.size.postln;
-				collectedLines.postcs;
-			};
-			offset = linesExecuted - collectedLines.size + 1;
-			// "offset ".post; offset.postln;
-			collectedLines.reverseDo{ |it,i|
-				string = string ++ (offset).asString.padLeft(4,"=") ++ "|";
-				string = string + it;
-				string = string ++ "\n";
-				offset = offset + 1;
-			};
-			// "offset ".post; offset.postln;
-			typedLines.do{ |it,i|
-				string = string ++ (i+offset).asString.padLeft(4,"-") ++ "|";
-				string = string + it[1];
-				string = string ++ "\n";
-			};
-		}{
-
-		*/
-			// only typed lines
-		// offset = (totalLines - noPrintLines + 1).max(0);
-		// typedLines.copyToEnd( offset ).do{ |it,i|
-		// 	string = string ++ (i+offset+linesExecuted+1).asString.padLeft(4," ") ++ "|";
-		// 	string = string + it[1];
-		// 	string = string ++ "\n";
-		// };
-	// };
-
-		// string = string ++ (currentLineFromFileIndex+1).asString.padLeft(4,"*") ++ "|";
-		// string = string + typing.string;
-		// typed.string_( string );
-
 		var itemsForView;
 		var string;
 		itemsForView = typedLines.collect{ |it,i|
