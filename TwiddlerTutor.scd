@@ -1,20 +1,26 @@
-"sounds.scd".resolveRelative.load;
 s.plotTree;
 
 
 // color of current line can be a mix of how well it is going. (red/green)
-// color management task in background (now there are delays in the code)
+//+ color management task in background (now there are delays in the code)
 // tutor should skip empty lines (?) and just post commented lines
 
 // + fix number of lines that are displayed ---> or which ones are displayed.
 
+
+// insert white space + | voor sublines van evaluated lines
+// at evaluate previous: set selected in listview
+// make a function to copy a previous to the edit window - also make that a ListView, so that a line can be selected to edit
+
 (
-~config = TwiddlerConfig.new( "twiddler_cfg_thumbless_1-1.csv".resolveRelative );
-~config.useShift = false;
+"sounds.scd".resolveRelative.load;
+
+c = TwiddlerConfig.new( "twiddler_cfg_thumbless_1-1.csv".resolveRelative );
+c.useShift = false;
 // ~config.config
 // ~config.typeCodes
 //~config2 = TwiddlerConfig.new( "twiddler_layout.csv".resolveRelative );
-g = TwiddlerTutor.new( ~config );
+g = TwiddlerTutor.new( c );
 );
 
 (
@@ -24,9 +30,13 @@ g.loadFile( "f0blog/2007-20-20-23h07-History-stripped_short.scd".resolveRelative
 );
 
 (
-g.typedRightAction = { |char| char.postln; Synth.new( \right, [ \trig, 1, \dur, 0.75, \freq,rrand(3,10)*100 ] ); };
-g.typedWrongAction = { |char| char.postln; Synth.new( \wrong, [ \trig, 1, \dur, 0.75, \freq,300, \fmf, 60, \fma, 0.25 ] ); };
-g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 800, \fmf, 40, \fma, 0.1 ] ); };
+q = ();
+q.asciiSpec = [0,127].asSpec;
+q.rightFreqSpec = [ 500, 5000, \exp ].asSpec;
+q.wrongFreqSpec = [ 250, 2500, \exp ].asSpec;
+g.typedRightAction = { |char| Synth.new( \right, [ \trig, 1, \dur, 0.75, \freq, char.ascii.specMap( q.asciiSpec, q.rightFreqSpec ) ] ); };
+g.typedWrongAction = { |char| Synth.new( \wrong, [ \trig, 1, \dur, 0.75, \freq, char.ascii.specMap( q.asciiSpec, q.wrongFreqSpec ), \fmf, 60, \fma, 0.25 ] ); };
+g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 1000, \fmf, 40, \fma, 0.1 ] ); };
 // Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 ); };
 );
 =
