@@ -2,15 +2,18 @@ s.plotTree;
 
 
 // color of current line can be a mix of how well it is going. (red/green)
-//+ color management task in background (now there are delays in the code)
+// + color management task in background (now there are delays in the code)
 // tutor should skip empty lines (?) and just post commented lines
 
 // + fix number of lines that are displayed ---> or which ones are displayed.
+// + insert white space + | voor sublines van evaluated lines
+// + at evaluate previous: set selected in listview
 
+// highlight buttons of character just typed in color of right or wrong
 
-// insert white space + | voor sublines van evaluated lines
-// at evaluate previous: set selected in listview
-// make a function to copy a previous to the edit window - also make that a ListView, so that a line can be selected to edit
+// make a function to copy a previous to the edit window
+// + also make that a ListView,
+// so that a line can be selected to edit
 
 (
 "sounds.scd".resolveRelative.load;
@@ -78,7 +81,6 @@ g.evaluatedLines[0].split( $\n ).postcs;
 
 
 
-s
 g.loadFile( "stenotutorial.scd".resolveRelative; );
 
 
