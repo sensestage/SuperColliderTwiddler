@@ -191,18 +191,11 @@ TwiddlerTutor {
 
 
 		typed = ListView.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.white );
-		typed.font_( Font.new( "Courier", 20) );
+		typed.font_( Font.new( "Courier", 20) ).canFocus_( false );
 
 
 		evaluatedW = ListView.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.gray(0.95) );
-		evaluatedW.font_( Font.new( "Courier", 20) ).hiliteColor_(defaultHiLiteColor);
-
-
-
-
-
-
-		// ~historyV = StaticText.new( window, Rect( 0,0, 800, 240 ) ).background_( Color.grey( 0.9 ) );
+		evaluatedW.font_( Font.new( "Courier", 20) ).hiliteColor_(defaultHiLiteColor).canFocus_( false );
 
 		skipjackUpdater = SkipJack.new( { this.updateColors }, 0.1, { window.isClosed }, "twiddlertutor" );
 	}
