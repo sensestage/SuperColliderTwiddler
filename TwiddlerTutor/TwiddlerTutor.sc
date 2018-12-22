@@ -163,6 +163,7 @@ TwiddlerTutor {
 		lineToTypeW.font_( Font.new( "Courier", 22) ).canFocus_( false );
 
 
+		// textview allows insertion of tab character, but that might need some adjustment to make that work...
 		typing = TextField.new( window, Rect( 0,0, 800, 70 ) ).background_( Color.white );
 		typing.font_( Font.new( "Courier", 22) );
 

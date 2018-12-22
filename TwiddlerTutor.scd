@@ -9,14 +9,19 @@ s.plotTree;
 // + insert white space + | voor sublines van evaluated lines
 // + at evaluate previous: set selected in listview
 
-// highlight buttons of character just typed in color of right or wrong
+// + highlight buttons of character just typed
+//      in color of right or wrong
+
+// catch arrow keys and up/down; change the shortcut for updating the next/prev line to type
+// catch arrow keys in edit (line) mode, so that we keep track of the cursor
+// maybe
 
 // some characters (capitals, special chars) are not recognised right
-// --- sometimes the key info we get is too late; perhaps then a comparison might be good to see what the new character typed was, before deeming something as wrong.
+// + sometimes the key info we get is too late; perhaps then a comparison might be good to see what the new character typed was, before deeming something as wrong.
 
-// make a function to copy a previous to the edit window
+// + make a function to copy a previous to the edit window
 // + also make that a ListView,
-// so that a line can be selected to edit
+// + so that a line can be selected to edit
 
 (
 "sounds.scd".resolveRelative.load;
