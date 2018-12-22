@@ -11,6 +11,9 @@ s.plotTree;
 
 // highlight buttons of character just typed in color of right or wrong
 
+// some characters (capitals, special chars) are not recognised right
+// --- sometimes the key info we get is too late; perhaps then a comparison might be good to see what the new character typed was, before deeming something as wrong.
+
 // make a function to copy a previous to the edit window
 // + also make that a ListView,
 // so that a line can be selected to edit
@@ -42,7 +45,7 @@ g.typedWrongAction = { |char| Synth.new( \wrong, [ \trig, 1, \dur, 0.75, \freq, 
 g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 1000, \fmf, 40, \fma, 0.1 ] ); };
 // Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 ); };
 );
-=
+
 
 g.noPrintLines
 
