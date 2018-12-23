@@ -1171,6 +1171,8 @@ TwiddlerTutor {
 			codeFunc.value;
 			// remove the line
 			typedLines.removeAt( typed.value );
+
+			evaluatedW.selection_( nil ).value_(0); // hopefully this goes to top?
 		}{
 			result=false;
 		};
@@ -1198,9 +1200,12 @@ TwiddlerTutor {
 			linesExecuted = this.calcEvaluatedLinesSize;
 			typedLines = []; // reset
 			codeFunc.value;
+
+			evaluatedW.selection_( nil ).value_(0); // hopefully this goes to top?
 		}{
 			result=false;
 		};
+
 		^result;
 	}
 
