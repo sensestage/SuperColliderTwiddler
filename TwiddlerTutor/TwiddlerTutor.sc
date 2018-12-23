@@ -178,7 +178,7 @@ TwiddlerTutor {
 		charsTypedW.background_( Color.gray(0.8) ).align_( \center );
 		charsTypedW.string_( "chars typed\n0" );
 
-		spacer1 = StaticText.new( window, Rect( 0, 0, 10, 86 ) );
+		spacer1 = StaticText.new( window, Rect( 0, 0, 5, 86 ) );
 
 		nextCharW = StaticText.new( window, Rect( 0, 0, 150, 86 ) );
 		nextCharW.font_( Font.new( "Courier", 64) );
@@ -202,14 +202,14 @@ TwiddlerTutor {
 					] ).canFocus_( false );
 		} };
 
-		spacer2 = StaticText.new( window, Rect( 0, 0, 10, 86 ) );
+		spacer2 = StaticText.new( window, Rect( 0, 0, 5, 86 ) );
 
 		idsLabel = StaticText.new( window, Rect( 0, 0, 100, 86 ) );
 		idsLabel.font_( Font.new( "Courier", 16) );
 		idsLabel.background_( Color.gray(0.8) ).align_( \right );
 		idsLabel.string_( "cursor:\nfrom file:\ntyped:\nevaluated:" );
 
-		idsW = StaticText.new( window, Rect( 0, 0, 60, 86 ) );
+		idsW = StaticText.new( window, Rect( 0, 0, 70, 86 ) );
 		idsW.font_( Font.new( "Courier", 16) );
 		idsW.background_( Color.gray(0.8) ).align_( \center );
 
