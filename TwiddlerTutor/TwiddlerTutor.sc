@@ -451,7 +451,11 @@ TwiddlerTutor {
 				},
 				$i, {
 					">> insert line".postln;
-					index = typed.selection.first;
+					if ( typed.selection.size > 0 ){
+						index = typed.selection.first;
+					}{
+						index = 0;
+					};
 					typedLines = typedLines.insert( index, [ typedLines.at(index)[0], "" ] );
 					// renumber the lines after
 					typedLines.do{ |it,i|
@@ -562,7 +566,7 @@ TwiddlerTutor {
 		// "parse character select from past mode".postln;
 		// [char,mods,keycode].postcs;
 		if ( char == $c ){ // copy
-			index = evaluatedW.value; // index of items
+			index = evaluatedW.value ? 0; // index of items
 			line = evaluatedLines.wrapAt( -1*index - 1 );
 			splitstring = line.split( $\n );
 			// [index,line,splitstring].postcs;
