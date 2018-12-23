@@ -506,22 +506,50 @@ TwiddlerTutor {
 			};
 		};
 		if ( mods == 524288 ){ // ALT
-			switch( char,
-				$\r, { //enter
-					">> evaluate line".postln;
+			if ( char == \r ){
+				">> evaluate line".postln;
 					// evaluate current line
 					evaluatedLast = 0;
 					codeResult = this.evaluateTypedLine;
 					this.setStringEvaluated;
 					this.setStringLineTyped;
+			};
+			// switch( char,
+			// 	$\r, { //enter
+			// 		">> evaluate line".postln;
+			// 		// evaluate current line
+			// 		evaluatedLast = 0;
+			// 		codeResult = this.evaluateTypedLine;
+			// 		this.setStringEvaluated;
+			// 		this.setStringLineTyped;
+			// 	},
+			// 	// $n, {
+			// 	// 	// show next line of to type
+			// 	// 	this.readNextLine;
+			// 	// },
+			// 	// $r, {
+			// 	// 	// show previous line of to type
+			// 	// 	this.readPreviousLine;
+			// 	// }
+			// );
+			switch( keycode,
+				65362, {
+					this.readNextLine;; justTyped = \up;
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
 				},
-				$n, {
-					// show next line of to type
-					this.readNextLine;
+				65364, {
+					this.readPreviousLine; justTyped = \down;
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
 				},
-				$r, {
-					// show previous line of to type
-					this.readPreviousLine;
+				65367, {
+					this.gotoLastLine; justTyped = \end;
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
 				}
 			);
 		};
@@ -542,6 +570,32 @@ TwiddlerTutor {
 			// typedLines.postln;
 			this.setStringLineTyped;
 			this.switchMode; // go to edit mode
+		};
+		if ( mods == 524288 ){ // ALT
+			if ( char == \r ){
+				">> re-evaluate line".postln;
+				this.reevaluateLine( evaluatedW.value + 1 );
+			};
+			switch( keycode,
+				65362, {
+					this.readNextLine;; justTyped = \up;
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				},
+				65364, {
+					this.readPreviousLine; justTyped = \down;
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				},
+				65367, {
+					this.gotoLastLine; justTyped = \end;
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				}
+			);
 		};
 	}
 
@@ -620,15 +674,27 @@ TwiddlerTutor {
 				this.updateNextChar;
 				this.highlightJustTyped( char );
 			}{ // char == 0.asAscii --> check keycode
-				switch( keycode,
-					65361, { this.decreaseCursorPosition; justTyped = \left; },
-					65363, { this.increaseCursorPosition; justTyped = \right; },
-					65360, { this.setCursorPosition(\home); justTyped = \home; },
-					65367, { this.setCursorPosition(\end); justTyped = \end; }
-				);
-				this.updateIDString;
-				this.updateNextChar; // this needs to be fixed
-				this.highlightJustTyped( justTyped );
+				if ( mods == 0 ){
+					switch( keycode,
+						65361, { this.decreaseCursorPosition; justTyped = \left; },
+						65363, { this.increaseCursorPosition; justTyped = \right; },
+						65360, { this.setCursorPosition(\home); justTyped = \home; },
+						65367, { this.setCursorPosition(\end); justTyped = \end; }
+					);
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				};
+				if ( mods == 524288 ){
+					switch( keycode,
+						65362, { this.readNextLine;; justTyped = \up; },
+						65364, { this.readPreviousLine; justTyped = \down; },
+						65367, { this.gotoLastLine; justTyped = \end; }
+					);
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				}
 			}
 		}
 	}
@@ -715,15 +781,27 @@ TwiddlerTutor {
 				this.updateNextChar; // this needs to be fixed
 				this.highlightJustTyped( char );
 			}{ // char == 0.asAscii --> check keycode
-				switch( keycode,
-					65361, { this.decreaseCursorPosition; justTyped = \left; },
-					65363, { this.increaseCursorPosition; justTyped = \right; },
-					65360, { this.setCursorPosition(\home); justTyped = \home; },
-					65367, { this.setCursorPosition(\end); justTyped = \end; }
-				);
-				this.updateIDString;
-				this.updateNextChar; // this needs to be fixed
-				this.highlightJustTyped( justTyped );
+				if ( mods == 0 ){
+					switch( keycode,
+						65361, { this.decreaseCursorPosition; justTyped = \left; },
+						65363, { this.increaseCursorPosition; justTyped = \right; },
+						65360, { this.setCursorPosition(\home); justTyped = \home; },
+						65367, { this.setCursorPosition(\end); justTyped = \end; }
+					);
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				};
+				if ( mods == 524288 ){
+					switch( keycode,
+						65362, { this.readNextLine;; justTyped = \up; },
+						65364, { this.readPreviousLine; justTyped = \down; },
+						65367, { this.gotoLastLine; justTyped = \end; }
+					);
+					this.updateIDString;
+					this.updateNextChar;
+					this.highlightJustTyped( justTyped );
+				}
 
 			}
 		}
@@ -941,6 +1019,17 @@ TwiddlerTutor {
 		if ( currentLineFromFileIndex < linesFromFile.size ){
 			newLine = linesFromFile[ currentLineFromFileIndex ];
 		};
+		if ( newLine.notNil ){
+			currentLineFromFile = newLine;
+			this.setStringLineToType;
+		};
+	}
+
+	gotoLastLine {
+		var newLine;
+		currentLineFromFile = "";
+		currentLineFromFileIndex = linesFromFile.size - 1;
+		newLine = linesFromFile[ currentLineFromFileIndex ];
 		if ( newLine.notNil ){
 			currentLineFromFile = newLine;
 			this.setStringLineToType;
