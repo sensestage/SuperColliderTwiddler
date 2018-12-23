@@ -320,7 +320,7 @@ TwiddlerTutor {
 		if ( keyUpAction.notNil ){ typing.removeAction( keyUpAction, \keyUpAction ); };
 		keyUpAction = { arg field, char, mods, unicode, keycode, key;
 			var lastTyped = field.string.last;
-			[char, mods, unicode, keycode, key].postcs;
+			// [char, mods, unicode, keycode, key].postcs;
 
 			charsTyped = charsTyped + 1;
 			charsTypedW.string_( "chars typed\n" ++ charsTyped.asString.padLeft(6,"0") );
@@ -348,7 +348,7 @@ TwiddlerTutor {
 		/// EVALUATED VIEW WINDOW
 		if ( evaluatedKeyAction.notNil ){ evaluatedW.removeAction( evaluatedKeyAction, \keyUpAction ); };
 		evaluatedKeyAction = { arg field, char, mods, unicode, keycode, key;
-			["evaluatedV", char, mods, unicode, keycode, key].postcs;
+			// ["evaluatedV", char, mods, unicode, keycode, key].postcs;
 			if ( char == 27.asAscii ){ // escape
 				this.checkCharacter( char, mods ); // was this the right character?
 				this.switchMode;
@@ -365,7 +365,7 @@ TwiddlerTutor {
 		/// TYPED VIEW WINDOW
 		if ( typedKeyAction.notNil ){ typed.removeAction( typedKeyAction, \keyUpAction ); };
 		typedKeyAction = { arg field, char, mods,unicode, keycode, key;
-			["typedV", char, mods, unicode, keycode, key].postcs;
+			// ["typedV", char, mods, unicode, keycode, key].postcs;
 			if ( char == 27.asAscii ){ // escape
 				this.checkCharacter( char, mods ); // was this the right character?
 				this.switchMode;
@@ -434,9 +434,9 @@ TwiddlerTutor {
 
 	parseCharacterEditTyped{|char,mods,keycode|
 		var index,line;
-		"parse character edit typed mode".postln;
-		[char,mods,keycode].postcs;
 		var justTyped;
+		// "parse character edit typed mode".postln;
+		// [char,mods,keycode].postcs;
 		if ( mods == 0 ){ // no modifiers
 			switch( char,
 				$k, {
@@ -480,7 +480,7 @@ TwiddlerTutor {
 				$e, {
 					">> edit line".postln;
 					// copy line to typing window
-					[ typed.value, typed.selection ].postln;
+					// [ typed.value, typed.selection ].postln;
 					if ( typed.selection.size > 0 ){
 						index = typed.selection.first;
 					}{
@@ -603,7 +603,7 @@ TwiddlerTutor {
 
 	parseCharacterEditMode{ |char,mods,keycode,lastTyped|
 		var justTyped, typingstring;
-		[char,mods,keycode,lastTyped].postcs;
+		// [char,mods,keycode,lastTyped].postcs;
 		if ( char == 8.asAscii ){ // backspace
 			// "typing action backspace".postln;
 			this.typedBackspace(true);
@@ -707,7 +707,7 @@ TwiddlerTutor {
 		var justTyped;
 		var typingstring;
 		// "parseCharacterEditLineMode".postln;
-		[ char, mods, keycode, lastTyped ].postcs;
+		// [ char, mods, keycode, lastTyped ].postcs;
 		// typedLines.postln;
 		if ( char == 8.asAscii ){ // backspace
 			// "typing action backspace".postln;
@@ -888,7 +888,7 @@ TwiddlerTutor {
 	}
 
 	checkCharacter{ |char, mods, last|
-		[ "checkCharacter", char, mods, last, nextToType ].postcs;
+		// [ "checkCharacter", char, mods, last, nextToType ].postcs;
 		if ( char == nextToType ){
 			typedLast = \right;
 			typedRightAction.value( char );
@@ -927,9 +927,9 @@ TwiddlerTutor {
 		// var foundIndex;
 		// var lastWord;
 		var foundChar;
-		"CURRENT line:\t".post; currentLineTyped.postcs;
-		"from file line:\t".post; currentLineFromFile.postcs;
-		"cursor at:\t".post; cursorPosition.postln;
+		// "CURRENT line:\t".post; currentLineTyped.postcs;
+		// "from file line:\t".post; currentLineFromFile.postcs;
+		// "cursor at:\t".post; cursorPosition.postln;
 
 		if ( currentLineFromFile.notNil ){
 			if ( cursorPosition >= currentLineFromFile.size ){
