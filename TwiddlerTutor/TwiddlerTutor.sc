@@ -66,6 +66,8 @@ TwiddlerTutor {
 	var <charsTyped = 0;
 	var <typingIndex = 0;
 
+	var <cursorPosition = 0;
+
 	var rehearseFile;
 
 	var <evaluatedLines;
@@ -98,6 +100,7 @@ TwiddlerTutor {
 
 	var hintsView;
 	var escV, delV, homeV, pupV, pdnV, endV, leftV, upV, dnV, rightV;
+	var modeV;
 
 	var keyUpAction;
 	var typedKeyAction;
@@ -121,10 +124,6 @@ TwiddlerTutor {
 	var <>typedWrongAction;
 	var <>typedBackspaceAction;
 	var <>typedEscapeAction;
-
-
-
-
 
 	*new{ |config|
 		^super.new.init( config );
@@ -208,7 +207,7 @@ TwiddlerTutor {
 		idsLabel = StaticText.new( window, Rect( 0, 0, 100, 86 ) );
 		idsLabel.font_( Font.new( "Courier", 16) );
 		idsLabel.background_( Color.gray(0.8) ).align_( \right );
-		idsLabel.string_( "from file:\ntyped:\nevaluated:" );
+		idsLabel.string_( "cursor:\nfrom file:\ntyped:\nevaluated:" );
 
 		idsW = StaticText.new( window, Rect( 0, 0, 60, 86 ) );
 		idsW.font_( Font.new( "Courier", 16) );
@@ -231,6 +230,8 @@ TwiddlerTutor {
 		upV = StaticText.new( hintsView, Rect( 572, 0, 78, 15 ) ).background_( Color.gray(0.95) ).string_( "^: " ++ config.at( \up ) ).align_( \center );
 		dnV = StaticText.new( hintsView, Rect( 572, 15, 78, 15 ) ).background_( Color.gray(0.95) ).string_( "v: " ++ config.at( \down ) ).align_( \center );
 		rightV = StaticText.new( hintsView, Rect( 652, 0, 78, 30 ) ).background_( Color.gray(0.95) ).string_( ">: " ++ config.at( \right ) ).align_( \center );
+
+		modeV = StaticText.new( hintsView, Rect( 732, 0, 78, 30 ) ).background_( Color.white ).string_( "mode:\n" ++ currentMode ).align_( \center );
 
 		/// typed lines
 
@@ -334,10 +335,10 @@ TwiddlerTutor {
 			}{
 				switch( currentMode,
 					\edit, {
-						this.parseCharacterEditMode( char, mods, lastTyped );
+						this.parseCharacterEditMode( char, mods, keycode, lastTyped );
 					},
 					\editTypedLine, {
-						this.parseCharacterEditLineMode( char, mods, lastTyped );
+						this.parseCharacterEditLineMode( char, mods, keycode, lastTyped );
 					}
 				);
 			};
@@ -354,7 +355,7 @@ TwiddlerTutor {
 				this.highlightJustTyped( char );
 			}{
 				if ( currentMode == \selectFromPast ){
-					this.parseCharacterSelectFromPastMode( char,mods );
+					this.parseCharacterSelectFromPastMode( char,mods, keycode );
 				};
 			};
 		};
@@ -371,7 +372,7 @@ TwiddlerTutor {
 				this.highlightJustTyped( char );
 			}{
 				if ( currentMode == \editTyped ){
-					this.parseCharacterEditTyped( char,mods );
+					this.parseCharacterEditTyped( char,mods, keycode );
 				};
 			};
 		};
@@ -397,12 +398,14 @@ TwiddlerTutor {
 				typing.canFocus_(true).focus(true).background_( Color.white );
 				typed.canFocus_(false).background_( Color.gray(0.95) );
 				evaluatedW.canFocus_(false).background_( Color.gray(0.95) );
+				modeV.string_( "mode:\nEDIT" );
 			},
 			\selectFromPast, {
 				// lineToTypeW.canFocus_(false).background_( Color.gray(0.95) );
 				typing.canFocus_(false).background_( Color.gray(0.95) );
 				typed.canFocus_(false).background_( Color.gray(0.95) );
 				evaluatedW.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
+				modeV.string_( "mode:\nSELECT\nPAST" );
 			},
 			// \selectFromFuture, {
 			// 	lineToTypeW.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
@@ -415,21 +418,24 @@ TwiddlerTutor {
 				typing.canFocus_(false).background_( Color.gray(0.95) );
 				typed.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
 				evaluatedW.canFocus_(false).background_( Color.gray(0.95) );
+				modeV.string_( "mode:\nEDIT\nTYPED" );
 			},
 			\editTypedLine, {
 				// lineToTypeW.canFocus_(false).background_( Color.gray(0.95) );
 				typing.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
 				typed.canFocus_(false).background_( Color.gray(0.95) );
 				evaluatedW.canFocus_(false).background_( Color.gray(0.95) );
+				modeV.string_( "mode:\nEDIT\nLINE" );
 			}
-
 		);
+
+
 	}
 
-	parseCharacterEditTyped{|char,mods|
+	parseCharacterEditTyped{|char,mods,keycode|
 		var index,line;
 		"parse character edit typed mode".postln;
-		[char,mods].postcs;
+		[char,mods,keycode].postcs;
 		if ( mods == 0 ){ // no modifiers
 			switch( char,
 				$k, {
@@ -482,6 +488,7 @@ TwiddlerTutor {
 					line = typedLines.at( index );
 					typing.string_( line[1] );
 					currentLineTyped = typing.string;
+					this.setCursorPosition(\end);
 					// go to mode: editing typed line
 					this.switchMode( \editTypedLine );
 			})
@@ -520,10 +527,10 @@ TwiddlerTutor {
 		};
 	}
 
-	parseCharacterSelectFromPastMode{|char,mods|
+	parseCharacterSelectFromPastMode{|char,mods,keycode|
 		var index,line,splitstring;
 		// "parse character select from past mode".postln;
-		// [char,mods].postcs;
+		// [char,mods,keycode].postcs;
 		if ( char == $c ){ // copy
 			index = evaluatedW.value; // index of items
 			line = evaluatedLines.wrapAt( -1*index - 1 );
@@ -538,15 +545,13 @@ TwiddlerTutor {
 		};
 	}
 
-	parseCharacterEditMode{ |char,mods,lastTyped|
-		[char,mods,lastTyped].postcs;
+	parseCharacterEditMode{ |char,mods,keycode,lastTyped|
+		var justTyped;
+		[char,mods,keycode,lastTyped].postcs;
 		if ( char == 8.asAscii ){ // backspace
 			// "typing action backspace".postln;
-			lastCharW.string_( "<--" );
 			this.typedBackspace(true);
 			this.setStringLineTyped;
-			this.updateNextChar;
-			this.highlightJustTyped( char );
 		}{
 			if ( char != 0.asAscii ){
 				// [ mods, char, lastTyped ].postcs;
@@ -583,6 +588,7 @@ TwiddlerTutor {
 						// just enter
 						// "~~~ enter".postln;
 						this.readNextLine;
+						this.setCursorPosition( \home ); // back to zero
 					};
 				}{
 					if ( mods == 524288 ){ // ALT
@@ -607,26 +613,34 @@ TwiddlerTutor {
 					}{
 						// "~~~ other char".postln;
 						currentLineTyped = typing.string;
+						this.increaseCursorPosition; // increase cursorposition
 					};
 				};
 				this.setStringLineTyped;
 				this.updateNextChar;
 				this.highlightJustTyped( char );
+			}{ // char == 0.asAscii --> check keycode
+				switch( keycode,
+					65361, { this.decreaseCursorPosition; justTyped = \left; },
+					65363, { this.increaseCursorPosition; justTyped = \right; },
+					65360, { this.setCursorPosition(\home); justTyped = \home; },
+					65367, { this.setCursorPosition(\end); justTyped = \end; }
+				);
+				this.updateIDString;
+				this.updateNextChar; // this needs to be fixed
+				this.highlightJustTyped( justTyped );
 			}
 		}
 	}
 
-	parseCharacterEditLineMode{ |char,mods,lastTyped|
+	parseCharacterEditLineMode{ |char,mods,keycode,lastTyped|
+		var justTyped;
 		// "parseCharacterEditLineMode".postln;
-		[ char, mods, lastTyped ].postcs;
+		[ char, mods, keycode, lastTyped ].postcs;
 		// typedLines.postln;
 		if ( char == 8.asAscii ){ // backspace
 			// "typing action backspace".postln;
-			lastCharW.string_( "<--" );
 			this.typedBackspace( false );
-			// this.setStringLineTyped; // not needed
-			this.updateNextChar; // this I need to fix
-			this.highlightJustTyped( char );
 		}{
 			if ( char != 0.asAscii ){
 				// [ mods, char, lastTyped ].postcs;
@@ -643,11 +657,15 @@ TwiddlerTutor {
 				};
 				if ( lastTyped.isNil ){
 					lastTyped = char;
+					"lastTyped is nil!!!".post;
+					[lastTyped, char, mods, keycode].postln;
 				};
 				lastCharW.string_( lastTyped.asCompileString );
 
 				// this.checkCharacter( lastTyped ); // was this the right character?
+
 				if( char == $\r and: (mods == 0) ){ // just enter
+					// update the line in the typed window and switch to that window again
 					var curIndex;
 					// update the line we are editing
 					currentLineTyped = typing.string;
@@ -664,6 +682,7 @@ TwiddlerTutor {
 						);
 						typing.string = "";
 						currentLineTyped = "";
+						this.setCursorPosition( \home ); // back to zero
 						this.readNextLine;
 						this.setStringLineTyped;
 						this.switchMode( \editTyped );
@@ -689,11 +708,23 @@ TwiddlerTutor {
 					}{
 						// "~~~ other char".postln;
 						currentLineTyped = typing.string;
+						this.increaseCursorPosition; // increase cursorposition
 					};
 				};
 				// this.setStringLineTyped; // update the window
 				this.updateNextChar; // this needs to be fixed
 				this.highlightJustTyped( char );
+			}{ // char == 0.asAscii --> check keycode
+				switch( keycode,
+					65361, { this.decreaseCursorPosition; justTyped = \left; },
+					65363, { this.increaseCursorPosition; justTyped = \right; },
+					65360, { this.setCursorPosition(\home); justTyped = \home; },
+					65367, { this.setCursorPosition(\end); justTyped = \end; }
+				);
+				this.updateIDString;
+				this.updateNextChar; // this needs to be fixed
+				this.highlightJustTyped( justTyped );
+
 			}
 		}
 	}
@@ -717,11 +748,41 @@ TwiddlerTutor {
 		reevaluatedLast = 0;
 	}
 
+	increaseCursorPosition{
+		cursorPosition = cursorPosition + 1;
+		if ( cursorPosition > typing.string.size ){
+			cursorPosition = typing.string.size;
+			^false;
+		}
+		^true;
+	}
+
+	decreaseCursorPosition{
+		cursorPosition = cursorPosition - 1;
+		if ( cursorPosition < 0 ){
+			cursorPosition = 0;
+			^false;
+		}
+		^true;
+	}
+
+	setCursorPosition{ |pos|
+		switch( pos,
+			\end, { cursorPosition = typing.string.size; },
+			\home, { cursorPosition = 0; },
+			{ cursorPosition = pos }
+		);
+	}
+
 	typedBackspace { |skipToPrevious=true|
 		var prevTyped = currentLineTyped;
 		// "==TYPING backpace: ".postln; currentLineTyped.postcs;
 		// "typed lines ".post; typedLines.size.postln; typedLines.postcs;
 		// only need to do something when going back a line...
+
+		lastCharW.string_( "<--" );
+
+		this.decreaseCursorPosition;
 		if ( currentLineTyped.size == 0 ){
 			// get previous line
 			if ( typedLines.size != 0 and: skipToPrevious ){ // otherwise nothing to backspace to
@@ -729,16 +790,16 @@ TwiddlerTutor {
 				currentLineFromFileIndex = typedLines.last[0];
 				currentLineFromFile = linesFromFile[ currentLineFromFileIndex ];
 				currentLineTyped = typedLines.last[1];
-				// increase it again as it always points to the NEXT line: // ?
-				// currentLineFromFileIndex = currentLineFromFileIndex + 1;
-				// "index ".post; currentLineFromFileIndex.postln;
-				// currentLineFromFile.postln;
 				typedLines = typedLines.drop(-1); // drop the last of the typed lines;
 			};
 			typing.string_( currentLineTyped );
+			this.setCursorPosition( \end );
 		}{
 			currentLineTyped = typing.string;
 		};
+
+		this.updateNextChar;
+		this.highlightJustTyped( 8.asAscii );
 	}
 
 	checkCharacter{ |char, mods, last|
@@ -778,11 +839,23 @@ TwiddlerTutor {
 	}
 
 	findNextChar{
-		var foundIndex;
-		var lastWord;
+		// var foundIndex;
+		// var lastWord;
 		var foundChar;
 		"CURRENT line:\t".post; currentLineTyped.postcs;
 		"from file line:\t".post; currentLineFromFile.postcs;
+		"cursor at:\t".post; cursorPosition.postln;
+
+		if ( currentLineFromFile.notNil ){
+			if ( cursorPosition >= currentLineFromFile.size ){
+				foundChar = $\r;
+			}{
+				foundChar = currentLineFromFile[cursorPosition];
+			}
+		};
+		^foundChar;
+
+		/*
 		if ( currentLineTyped.notNil ){
 			lastWord = currentLineTyped;
 			// "LAST word: ".post; lastWord.postcs;
@@ -801,6 +874,7 @@ TwiddlerTutor {
 			};
 		};
 		^foundChar;
+		*/
 	}
 
 	updateNextChar { // |char|
@@ -838,7 +912,8 @@ TwiddlerTutor {
 			switch( char,
 				8.asAscii, { symbol = \backspace },
 				27.asAscii, { symbol = \escape },
-				127.asAscii, { symbol = \delete }
+				127.asAscii, { symbol = \delete },
+				{ symbol = char }
 			);
 			code = config.at( symbol );
 		};
@@ -957,9 +1032,15 @@ TwiddlerTutor {
 		typed.items_( itemsForView );
 		typed.value_( curSelected.first ).selection_( curSelected );
 
+		this.updateIDString;
+	}
 
+	updateIDString{
+		var string;
 		// ids string
 		string = "";
+		string = string ++ cursorPosition.asString.padLeft(2) ++ ":";
+		string = string ++ typing.string.size.asString.padLeft(2) ++ "\n";
 		string = string ++ currentLineFromFileIndex.asString.padLeft(2) ++ ":";
 		string = string ++ linesFromFile.size.asString.padLeft(2) ++ "\n";
 		string = string ++ currentLineTypedIndex.asString.padLeft(2) ++ ":";
