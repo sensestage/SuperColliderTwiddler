@@ -538,13 +538,13 @@ TwiddlerTutor {
 			// 	// }
 			// );
 			switch( keycode,
-				65362, {
+				65364, {
 					this.readNextLine; justTyped = \up;
 					this.updateIDString;
 					this.updateNextChar;
 					this.highlightJustTyped( justTyped );
 				},
-				65364, {
+				65362, {
 					this.readPreviousLine; justTyped = \down;
 					this.updateIDString;
 					this.updateNextChar;
@@ -584,13 +584,13 @@ TwiddlerTutor {
 				this.reevaluateLine( index + 1 );
 			};
 			switch( keycode,
-				65362, {
+				65364, {
 					this.readNextLine; justTyped = \up;
 					this.updateIDString;
 					this.updateNextChar;
 					this.highlightJustTyped( justTyped );
 				},
-				65364, {
+				65362, {
 					this.readPreviousLine; justTyped = \down;
 					this.updateIDString;
 					this.updateNextChar;
@@ -696,8 +696,8 @@ TwiddlerTutor {
 				};
 				if ( mods == 524288 ){
 					switch( keycode,
-						65362, { this.readNextLine; justTyped = \up; },
-						65364, { this.readPreviousLine; justTyped = \down; },
+						65364, { this.readNextLine; justTyped = \up; },
+						65362, { this.readPreviousLine; justTyped = \down; },
 						65367, { this.gotoLastLine; justTyped = \end; }
 					);
 					this.updateIDString;
@@ -809,8 +809,8 @@ TwiddlerTutor {
 				};
 				if ( mods == 524288 ){
 					switch( keycode,
-						65362, { this.readNextLine; justTyped = \up; },
-						65364, { this.readPreviousLine; justTyped = \down; },
+						65364, { this.readNextLine; justTyped = \up; },
+						65362, { this.readPreviousLine; justTyped = \down; },
 						65367, { this.gotoLastLine; justTyped = \end; }
 					);
 					this.updateIDString;
