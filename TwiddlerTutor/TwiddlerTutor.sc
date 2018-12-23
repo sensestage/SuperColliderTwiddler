@@ -580,7 +580,8 @@ TwiddlerTutor {
 		if ( mods == 524288 ){ // ALT
 			if ( char == \r ){
 				">> re-evaluate line".postln;
-				this.reevaluateLine( evaluatedW.value + 1 );
+				index = evaluatedW.value ? 0; // index of items
+				this.reevaluateLine( index + 1 );
 			};
 			switch( keycode,
 				65362, {
