@@ -774,6 +774,7 @@ TwiddlerTutor {
 							typing.string_( currentLineTyped );
 							this.setStringEvaluated;
 						};
+						/*
 						if( char == $n ){ // show next line of to type
 							this.readNextLine;
 							currentLineTyped = typing.string.drop( -1 );
@@ -784,6 +785,7 @@ TwiddlerTutor {
 							currentLineTyped = typing.string.drop( -1 );
 							typing.string_( currentLineTyped );
 						};
+						*/
 					}{
 						// "~~~ other char".postln;
 						currentLineTyped = typing.string;
