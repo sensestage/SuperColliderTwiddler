@@ -749,15 +749,16 @@ TwiddlerTutor {
 					currentLineTyped = typing.string;
 					if ( currentLineTyped.size > 0 ){
 						curIndex = typed.selection.first ? 0;
-						[ "enter edited line",
+						/*[ "enter edited line",
 							typed.value, typedLines.at( typed.value ),
 							typed.selection, curIndex, typedLines.at( curIndex )
-						].postln;
+						].postln;*/
 
 						typedLines.put(
 							curIndex,
 							[ typedLines.at( curIndex )[0], currentLineTyped ]
 						);
+						typed.selection_( typed.selection + 1 ); // advance the line with one
 						typing.string = "";
 						currentLineTyped = "";
 						this.setCursorPosition( \home ); // back to zero
