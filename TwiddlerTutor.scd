@@ -12,15 +12,17 @@ s.plotTree;
 // + highlight buttons of character just typed
 //      in color of right or wrong
 
-// catch arrow keys and up/down; change the shortcut for updating the next/prev line to type
+// + catch arrow keys and up/down; change the shortcut for updating the next/prev line to type
 // + catch arrow keys in edit (line) mode, so that we keep track of the cursor
 // + fix cursorPosition when editing new line from typed window.
 
-// line from file index is sometimes fucked up. Make a "go to end option"
-// perhaps use ALT-up, ALT-down, ALT-end for navigation
+// + line from file index is sometimes fucked up. Make a "go to end option"
+// + perhaps use ALT-up, ALT-down, ALT-end for navigation
 
-// when entering line in edittypedline mode, then also advance line to next
-// when executing code, reset the selected, so that the scroll is at the top of evaluated window
+// + when entering line in edittypedline mode, then also advance line to next
+// + when executing code, reset the selected, so that the scroll is at the top of evaluated window
+
+// sonification of navigation
 
 // some characters (capitals, special chars) are not recognised right
 // + sometimes the key info we get is too late; perhaps then a comparison might be good to see what the new character typed was, before deeming something as wrong.
@@ -69,56 +71,6 @@ g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 1000, \fmf, 40, \f
 // esc: 65307, 16777216
 // backspace: 65288, 16777219
 // delete: 127, 65535, 16777223
-
-g.nPrintLines
-
-"	SinOsc.ar( \\freq.kr(500, 4), 0, \\amp.kr(0.1))".at(0).postcs
-.find($\t)
-
-g.charsTyped
-g.dump
-g.linesFromFile.postcs;
-g.typedLines.postcs;
-g.typedLines.size;
-g.evaluatedLines.postcs;
-g.linesExecuted
-
-g.calcEvaluatedLinesSize
-
-g.currentLineFromFileIndex.postcs
-g.currentLineTyped.postcs
-g.findNextChar
-g.typedLines.postcs
-
-g.setStringLineTyped
-
-"--- find matching line ---".postln;
-"currentTyped".post; g.currentLineTyped.postln;
-g.typedLines
-(
-g.linesFromFile.drop(-1).reverseDo{ |it,i|
-	[it,g.linesFromFile.size - 2 - i].postln;
-	(g.typedLines.last == it).postln;
-
-};
-)
-
-g.evaluatedLines[0].split( $\n ).postcs;
-
-
-
-g.loadFile( "stenotutorial.scd".resolveRelative; );
-
-
-t.push
-newline:
-t.quelle(\a, { Impulse.ar(LFNoise1.kr(0.1).range(1, 4)) });
-t.filter(\b, { |input| RLPF.ar(input, MouseX.kr(200, 10000, 1) + Rand(0, 300), 0.03) });
-newline:
-t.filter(\c, { |input| DelayC.ar(input, 0.2, SinOsc.ar(Rand(2, 8)).range(0, 0.2)) + input })
---abc;
-
-// problem with evaluating code -> steno uses preprocessor
 
 
 
