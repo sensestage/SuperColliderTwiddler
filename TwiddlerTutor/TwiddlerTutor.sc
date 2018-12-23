@@ -404,7 +404,7 @@ TwiddlerTutor {
 				// lineToTypeW.canFocus_(false).background_( Color.gray(0.95) );
 				typing.canFocus_(false).background_( Color.gray(0.95) );
 				typed.canFocus_(false).background_( Color.gray(0.95) );
-				evaluatedW.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
+				evaluatedW.canFocus_(true).focus(true).background_( Color(1,0.9,1) );
 				modeV.string_( "mode:\nSELECT\nPAST" );
 			},
 			// \selectFromFuture, {
@@ -416,13 +416,13 @@ TwiddlerTutor {
 			\editTyped, {
 				// lineToTypeW.canFocus_(false).background_( Color.gray(0.95) );
 				typing.canFocus_(false).background_( Color.gray(0.95) );
-				typed.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
+				typed.canFocus_(true).focus(true).background_( Color(1,0.9,1) );
 				evaluatedW.canFocus_(false).background_( Color.gray(0.95) );
 				modeV.string_( "mode:\nEDIT\nTYPED" );
 			},
 			\editTypedLine, {
 				// lineToTypeW.canFocus_(false).background_( Color.gray(0.95) );
-				typing.canFocus_(true).focus(true).background_( Color(1,0.95,1) );
+				typing.canFocus_(true).focus(true).background_( Color(1,0.9,1) );
 				typed.canFocus_(false).background_( Color.gray(0.95) );
 				evaluatedW.canFocus_(false).background_( Color.gray(0.95) );
 				modeV.string_( "mode:\nEDIT\nLINE" );
