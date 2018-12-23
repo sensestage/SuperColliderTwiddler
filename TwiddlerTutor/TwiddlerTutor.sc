@@ -436,6 +436,7 @@ TwiddlerTutor {
 		var index,line;
 		"parse character edit typed mode".postln;
 		[char,mods,keycode].postcs;
+		var justTyped;
 		if ( mods == 0 ){ // no modifiers
 			switch( char,
 				$k, {
@@ -534,7 +535,7 @@ TwiddlerTutor {
 			// );
 			switch( keycode,
 				65362, {
-					this.readNextLine;; justTyped = \up;
+					this.readNextLine; justTyped = \up;
 					this.updateIDString;
 					this.updateNextChar;
 					this.highlightJustTyped( justTyped );
@@ -557,6 +558,7 @@ TwiddlerTutor {
 
 	parseCharacterSelectFromPastMode{|char,mods,keycode|
 		var index,line,splitstring;
+		var justTyped;
 		// "parse character select from past mode".postln;
 		// [char,mods,keycode].postcs;
 		if ( char == $c ){ // copy
@@ -578,7 +580,7 @@ TwiddlerTutor {
 			};
 			switch( keycode,
 				65362, {
-					this.readNextLine;; justTyped = \up;
+					this.readNextLine; justTyped = \up;
 					this.updateIDString;
 					this.updateNextChar;
 					this.highlightJustTyped( justTyped );
@@ -689,7 +691,7 @@ TwiddlerTutor {
 				};
 				if ( mods == 524288 ){
 					switch( keycode,
-						65362, { this.readNextLine;; justTyped = \up; },
+						65362, { this.readNextLine; justTyped = \up; },
 						65364, { this.readPreviousLine; justTyped = \down; },
 						65367, { this.gotoLastLine; justTyped = \end; }
 					);
@@ -799,7 +801,7 @@ TwiddlerTutor {
 				};
 				if ( mods == 524288 ){
 					switch( keycode,
-						65362, { this.readNextLine;; justTyped = \up; },
+						65362, { this.readNextLine; justTyped = \up; },
 						65364, { this.readPreviousLine; justTyped = \down; },
 						65367, { this.gotoLastLine; justTyped = \end; }
 					);
