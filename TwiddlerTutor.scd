@@ -13,8 +13,14 @@ s.plotTree;
 //      in color of right or wrong
 
 // catch arrow keys and up/down; change the shortcut for updating the next/prev line to type
-// catch arrow keys in edit (line) mode, so that we keep track of the cursor
-// maybe
+// + catch arrow keys in edit (line) mode, so that we keep track of the cursor
+// + fix cursorPosition when editing new line from typed window.
+
+// line from file index is sometimes fucked up. Make a "go to end option"
+// perhaps use ALT-up, ALT-down, ALT-end for navigation
+
+// when entering line in edittypedline mode, then also advance line to next
+// when executing code, reset the selected, so that the scroll is at the top of evaluated window
 
 // some characters (capitals, special chars) are not recognised right
 // + sometimes the key info we get is too late; perhaps then a comparison might be good to see what the new character typed was, before deeming something as wrong.
@@ -51,8 +57,20 @@ g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 1000, \fmf, 40, \f
 // Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 ); };
 );
 
+// home: 65360, 16777232
+// end:  65367, 16777233
+// pageup: 65365, 16777238
+// pagedown: 65366, 16777239
+// left: 65361, 16777234
+// right: ,65363, 16777236
+// down: 65364, 16777237
+// up: 65362, 16777235
 
-g.noPrintLines
+// esc: 65307, 16777216
+// backspace: 65288, 16777219
+// delete: 127, 65535, 16777223
+
+g.nPrintLines
 
 "	SinOsc.ar( \\freq.kr(500, 4), 0, \\amp.kr(0.1))".at(0).postcs
 .find($\t)
