@@ -600,7 +600,7 @@ TwiddlerTutor {
 	}
 
 	parseCharacterEditMode{ |char,mods,keycode,lastTyped|
-		var justTyped;
+		var justTyped, typingstring;
 		[char,mods,keycode,lastTyped].postcs;
 		if ( char == 8.asAscii ){ // backspace
 			// "typing action backspace".postln;
@@ -618,7 +618,9 @@ TwiddlerTutor {
 				};
 				if ( char == $\t ){
 					lastTyped = $\t;
-					typing.string_( typing.string.add( lastTyped ) );
+					typingstring = typing.string.insert( cursorPosition, lastTyped );
+					typing.string_( typingstring );
+					// typing.string_( typing.string.add( lastTyped ) );
 				};
 				if ( lastTyped.isNil ){
 					lastTyped = char;
@@ -701,6 +703,7 @@ TwiddlerTutor {
 
 	parseCharacterEditLineMode{ |char,mods,keycode,lastTyped|
 		var justTyped;
+		var typingstring;
 		// "parseCharacterEditLineMode".postln;
 		[ char, mods, keycode, lastTyped ].postcs;
 		// typedLines.postln;
@@ -719,7 +722,9 @@ TwiddlerTutor {
 				};
 				if ( char == $\t ){
 					lastTyped = $\t;
-					typing.string_( typing.string.add( lastTyped ) ); // this might give issues
+					typingstring = typing.string.insert( cursorPosition, lastTyped );
+					typing.string_( typingstring );
+					// typing.string_( typing.string.add( lastTyped ) ); // this might give issues
 				};
 				if ( lastTyped.isNil ){
 					lastTyped = char;
