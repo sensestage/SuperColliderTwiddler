@@ -41,10 +41,12 @@ TwiddlerTutor {
 	var escV, delV, homeV, pupV, pdnV, endV, leftV, upV, dnV, rightV;
 	var modeV;
 
+
 	var keyUpAction;
 	var typedKeyAction;
 	var evaluatedKeyAction;
-	var toTypeKeyAction;
+	// var toTypeKeyAction;
+
 
 	var nextToType, typing;
 
@@ -294,7 +296,7 @@ TwiddlerTutor {
 				this.highlightJustTyped( char );
 			}{
 				if ( currentMode == \selectFromPast ){
-					this.parseCharacterSelectFromPastMode( char,mods, keycode );
+					this.parseCharacterSelectFromPastMode( char, mods, keycode );
 				};
 			};
 		};
@@ -311,7 +313,7 @@ TwiddlerTutor {
 				this.highlightJustTyped( char );
 			}{
 				if ( currentMode == \editTyped ){
-					this.parseCharacterEditTyped( char,mods, keycode );
+					this.parseCharacterEditTyped( char, mods, keycode );
 				};
 			};
 		};
