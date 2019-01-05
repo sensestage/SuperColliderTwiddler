@@ -84,7 +84,7 @@ TwiddlerConfig {
 		charMod = modifier;
 
 		if ( char.isNil ){ // no character found with modifier
-			"lookup without modifier".postln;
+			// "lookup without modifier".postln;
 			// check if there is a lookup without the modifier
 			char = chordMap.at( 'O', chord );
 			// if ( char.notNil ){
@@ -92,40 +92,47 @@ TwiddlerConfig {
 			// };
 		};
 		if ( char.notNil ){
-			"lookup continues...".postln;
+			// "lookup continues...".postln;
 			// translate <Left Shift>, <Alt>, <Left Ctrl>
 			if ( char.isKindOf( String ) ){
-				if ( charMod == 'O' ){
-					charModString = "";
+				if ( char.size == 1 ){ // single character
+					char = char.first;
 				}{
-					charModString = charMod.asString;
-				};
-				if ( char.contains( "<Left Shift>" ) ){
-					charModString = charModString ++ "S";
-					char = char.replace( "<Left Shift>", "" );
-					char = char.replace( "</Left Shift>", "" );
-				};
-				if ( char.contains( "<Alt>" ) ){
-					charModString = charModString ++ "C";
-					char = char.replace( "<Alt>", "" );
-					char = char.replace( "</Alt>", "" );
-				};
-				if ( char.contains( "<Left Ctrl>" ) ){
-					charModString = charModString ++ "C";
-					char = char.replace( "<Left Ctrl>", "" );
-					char = char.replace( "</Left Ctrl>", "" );
-				};
-				specialChar = this.findSpecialChar( char );
-				if ( specialChar.notNil ){
-					char = specialChar;
-				};
-				if ( charModString.size == 0 ){
-					charMod = 'O';
-				}{
-					charMod = charModString;
+					if ( charMod == 'O' ){
+						charModString = "";
+					}{
+						charModString = charMod.asString;
+					};
+					if ( char.contains( "<Left Shift>" ) ){
+						charModString = charModString ++ "S";
+						char = char.replace( "<Left Shift>", "" );
+						char = char.replace( "</Left Shift>", "" );
+					};
+					if ( char.contains( "<Alt>" ) ){
+						charModString = charModString ++ "C";
+						char = char.replace( "<Alt>", "" );
+						char = char.replace( "</Alt>", "" );
+					};
+					if ( char.contains( "<Left Ctrl>" ) ){
+						charModString = charModString ++ "C";
+						char = char.replace( "<Left Ctrl>", "" );
+						char = char.replace( "</Left Ctrl>", "" );
+					};
+					specialChar = this.findSpecialChar( char );
+					if ( specialChar.notNil ){
+						char = specialChar;
+					};
+					if ( charModString.size == 0 ){
+						charMod = 'O';
+					}{
+						charMod = charModString;
+					};
+					if ( char.size == 1 ){ // single character
+						char = char.first;
+					};
 				};
 			};
-			^[ charMod.asSymbol, char.asSymbol ];
+			^[ charMod.asSymbol, char ];
 		};
 		^nil; // sadly, didn't find anything :(
 	}
