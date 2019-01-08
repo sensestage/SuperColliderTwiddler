@@ -387,7 +387,9 @@ TwiddlerTutor {
 					}{
 						index = 0;
 					};
-					killedLine = typedLines.removeAt( index );
+					if ( typedLines.size > index ){
+						killedLine = typedLines.removeAt( index );
+					};
 					this.setStringLineTyped;
 				},
 				$i, {
@@ -397,7 +399,11 @@ TwiddlerTutor {
 					}{
 						index = 0;
 					};
-					typedLines = typedLines.insert( index, [ typedLines.at(index)[0], "" ] );
+					if ( typedLines.size > index ){
+						typedLines = typedLines.insert( index, [ typedLines.at(index)[0], "" ] );
+					}{
+						typedLines = typedLines.add( [ typedLines.last[0] + 1, "" ] );
+					};
 					// renumber the lines after
 					typedLines.do{ |it,i|
 						if ( i > index ){
@@ -413,7 +419,11 @@ TwiddlerTutor {
 					}{
 						index = 0;
 					};
-					typedLines = typedLines.insert( index, [ typedLines.at(index)[0], killedLine[1] ] );
+					if ( typedLines.size > index ){
+						typedLines = typedLines.insert( index, [ typedLines.at(index)[0], killedLine[1] ] );
+					}{
+						typedLines = typedLines.add( [ typedLines.last[0] + 1, killedLine[1] ] );
+					};
 					// renumber the lines after
 					typedLines.do{ |it,i|
 						if ( i > index ){
@@ -431,9 +441,11 @@ TwiddlerTutor {
 					}{
 						index = 0;
 					};
-					line = typedLines.at( index );
-					typing.string_( line[1] );
-					currentLineTyped = typing.string;
+					if ( typedLines.size > index ){
+						line = typedLines.at( index );
+						typing.string_( line[1] );
+						currentLineTyped = typing.string;
+					};
 					this.setCursorPosition(\end);
 					// go to mode: editing typed line
 					this.switchMode( \editTypedLine );
@@ -509,10 +521,12 @@ TwiddlerTutor {
 		if ( char == $c ){ // copy
 			index = evaluatedW.value ? 0; // index of items
 			line = evaluatedLines.wrapAt( -1*index - 1 );
-			splitstring = line.split( $\n );
-			// [index,line,splitstring].postcs;
-			splitstring.do{ |it,i|
-				typedLines = typedLines.add( [currentLineTypedIndex + i, it ] );
+			if ( line.notNil ){
+				splitstring = line.split( $\n );
+				// [index,line,splitstring].postcs;
+				splitstring.do{ |it,i|
+					typedLines = typedLines.add( [currentLineTypedIndex + i, it ] );
+				};
 			};
 			// typedLines.postln;
 			this.setStringLineTyped;
