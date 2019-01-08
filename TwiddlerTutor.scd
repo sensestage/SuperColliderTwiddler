@@ -1,5 +1,4 @@
-s.plotTree;
-
+// s.plotTree;
 
 // color of current line can be a mix of how well it is going. (red/green)
 // + color management task in background (now there are delays in the code)
@@ -32,9 +31,10 @@ s.plotTree;
 // + so that a line can be selected to edit
 
 (
-"sounds.scd".resolveRelative.load;
-
-c = TwiddlerConfig.new( "twiddler_cfg_thumbless_1-1.csv".resolveRelative );
+// c = TwiddlerConfig.new( "twiddler_cfg_thumbless_1-1.csv".resolveRelative );
+c = TwiddlerConfig.new(
+	"twiddler_cfg_thumbless_reduced.csv".resolveRelative
+);
 c.useShift = false;
 // ~config.config
 // ~config.typeCodes
@@ -43,7 +43,8 @@ g = TwiddlerTutor.new( c );
 );
 
 (
-g.reset; g.updateWindow;
+"sounds.scd".resolveRelative.load;
+g.reset; g.gui.updateWindow;
 g.loadFile( "f0blog/2007-20-20-23h07-History-stripped_short.scd".resolveRelative );
 // g.loadFile( "testscore.scd".resolveRelative; );
 );
@@ -53,10 +54,22 @@ q = ();
 q.asciiSpec = [0,127].asSpec;
 q.rightFreqSpec = [ 500, 5000, \exp ].asSpec;
 q.wrongFreqSpec = [ 250, 2500, \exp ].asSpec;
-g.typedRightAction = { |char| Synth.new( \right, [ \trig, 1, \dur, 0.75, \freq, char.ascii.specMap( q.asciiSpec, q.rightFreqSpec ) ] ); };
-g.typedWrongAction = { |char| Synth.new( \wrong, [ \trig, 1, \dur, 0.75, \freq, char.ascii.specMap( q.asciiSpec, q.wrongFreqSpec ), \fmf, 60, \fma, 0.25 ] ); };
+g.typedRightAction = { |char| char.postln;
+	if ( char.notNil ){
+		Synth.new( \right, [ \trig, 1, \dur, 0.75, \freq, char.ascii.specMap( q.asciiSpec, q.rightFreqSpec ) ] );
+	}{
+		"right!! but char is nil".postln;
+	};
+};
+g.typedWrongAction = { |char|
+	char.postln;
+	if ( char.notNil ){
+		Synth.new( \wrong, [ \trig, 1, \dur, 0.75, \freq, char.ascii.specMap( q.asciiSpec, q.wrongFreqSpec ), \fmf, 60, \fma, 0.25 ] );
+	}{
+		"wrong!! but char is nil".postln;
+	};
+};
 g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 1000, \fmf, 40, \fma, 0.1 ] ); };
-// Ndef( \back ).set( \trig, 1, \freq, rrand(3,10)*100, \dur, 0.1, \fmf, 40, \fma, 0.1 ); };
 );
 
 // home: 65360, 16777232
@@ -71,8 +84,6 @@ g.typedBackspaceAction = { Synth.new( \back, [\trig,1, \freq, 1000, \fmf, 40, \f
 // esc: 65307, 16777216
 // backspace: 65288, 16777219
 // delete: 127, 65535, 16777223
-
-
 
 //// Jack Armitage - stenophone to livecode
 /// group: embodiment and livecoding
