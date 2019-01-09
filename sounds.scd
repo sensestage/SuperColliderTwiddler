@@ -27,6 +27,13 @@ SynthDef( \back, {
 		SinOsc.ar( \freq.kr(300)*[1,5/3,3/2] * LFTri.ar( \fmf.kr(10),0,\fma.kr(0.1), 1 ), 0, 0.025/3 * EnvGen.kr( Env.perc, \trig.tr(1), timeScale: \dur.kr(1)*[2,3,1], doneAction: [0,2,0] ) ).sum
 	))
 }).add;
+
+SynthDef( \navigate, {
+	Out.ar( \out.kr(0), Splay.ar(
+		SinOsc.ar( \freq.kr(300) * ( Array.rand(10, 0.96, 1.06 ) ), 0, EnvGen.kr(Env.perc(0.01,0.1), doneAction: 2 )*\amp.kr(0.1) )
+	));
+}).add;
+
 );
 
 /*
