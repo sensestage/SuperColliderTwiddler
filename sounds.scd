@@ -1,14 +1,4 @@
 // s.boot;
-/*
-(
-s.doWhenBooted({
-	Ndef( \right, { SinOsc.ar( \freq.kr(800)*[1,5/3,3/2], 0, 0.025/3 * EnvGen.kr( Env.perc, \trig.tr(1), timeScale: \dur.kr(1)*[1,2,3] ) ).sum }).play;
-	Ndef( \wrong, { SinOsc.ar( \freq.kr(200)*[1,5/3-0.1,3/2-0.05] * LFPulse.ar( \fmf.kr(10),0,0.5,\fma.kr(0.1), 1 ), 0, 0.025/3 * EnvGen.kr( Env.perc, \trig.tr(1), timeScale: \dur.kr(1)*[3,2,1] ) ).sum }).play;
-
-	Ndef( \back, { SinOsc.ar( \freq.kr(300)*[1,5/3,3/2] * LFTri.ar( \fmf.kr(10),0,\fma.kr(0.1), 1 ), 0, 0.025/3 * EnvGen.kr( Env.perc, \trig.tr(1), timeScale: \dur.kr(1)*[2,3,1] ) ).sum }).play;
-});
-);
-*/
 (
 SynthDef( \right, {
 	Out.ar( \out.kr(0), Pan2.ar(
